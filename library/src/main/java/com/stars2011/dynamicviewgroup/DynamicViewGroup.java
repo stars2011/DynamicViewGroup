@@ -44,53 +44,14 @@ public class DynamicViewGroup extends ViewGroup {
         int heightMode = MeasureSpec.getMode(heightMeasureSpec);
         int heightSize = MeasureSpec.getSize(heightMeasureSpec);
         measureChildren(widthMeasureSpec, heightMeasureSpec);
-
-        if (widthMode == MeasureSpec.AT_MOST && heightMode == MeasureSpec.AT_MOST) { // 实现wrap_content
-            int resultWidth = 0;
-            int resultHeight = 0;
-            int calculateWidth = 0;
-            int calculateHeight = 0;
-            int childCount = getChildCount();
-            // 遍历子View计算宽高
-            for (int i = 0; i < childCount; i++) {
-                View childView = getChildAt(i);
-                int childViewWidth = childView.getMeasuredWidth();
-                int childViewHeight = childView.getMeasuredHeight();
-                if (calculateWidth + childViewWidth > widthSize) { // 超过了单行最大的宽度,需要换行
-                    resultWidth = Math.max(resultWidth, calculateWidth);
-                    resultHeight += calculateHeight;
-                    calculateWidth = 0;
-                    calculateHeight = 0;
-                } else {
-                    calculateWidth += childViewWidth;
-                    calculateHeight = Math.max(calculateHeight, childViewHeight);
-                }
-            }
-            setMeasuredDimension(resultWidth, resultHeight);
-        } else if (widthMode == MeasureSpec.AT_MOST) { // 无论heightMode是EXACTLY还是UNSPECIFIED，高度都是使用原本指定的heightSize
-            int resultWidth = 0;
-            int resultHeight = heightSize;
-            int calculateWidth = 0;
-            int calculateHeight = 0;
-            int childCount = getChildCount();
-            // 遍历子View计算宽高
-            for (int i = 0; i < childCount; i++) {
-                View childView = getChildAt(i);
-                int childViewWidth = childView.getMeasuredWidth();
-                int childViewHeight = childView.getMeasuredHeight();
-                if (calculateWidth + childViewWidth > widthSize) { // 超过了单行最大的宽度,需要换行
-                    resultWidth = Math.max(resultWidth, calculateWidth);
-                    resultHeight += calculateHeight;
-                    calculateWidth = 0;
-                    calculateHeight = 0;
-                } else {
-                    calculateWidth += childViewWidth;
-                    calculateHeight = Math.max(calculateHeight, childViewHeight);
-                }
-            }
-        } else if (heightMode == MeasureSpec.AT_MOST) { // 无论widthMode是EXACTLY还是UNSPECIFIED，高度都是使用原本指定的widthSize
-
+        if (widthMode == MeasureSpec.AT_MOST || heightMode == MeasureSpec.AT_MOST) { // 实现wrap_content
+            calculateSizeAndSetMeasuredDimension(widthSize, heightSize);
         }
+    }
+
+    private void calculateSizeAndSetMeasuredDimension(int maxWidth, int maxHeight) {
+        ResultSize resultSize = getMeasureResultSizeForHorizontal(maxWidth, maxHeight);
+        setMeasuredDimension(resultSize.getResultWidth(), resultSize.getResultHeight());
     }
 
     private ResultSize getMeasureResultSizeForHorizontal(int maxWidth, int maxHeight) {

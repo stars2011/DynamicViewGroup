@@ -79,22 +79,15 @@ public class DynamicViewGroup extends ViewGroup {
         // 遍历子View计算宽高
         for (int i = 0; i < childCount; i++) {
             View childView = getChildAt(i);
-            ViewGroup.LayoutParams childViewLayoutParams = childView.getLayoutParams();
-            int leftMargin = 0;
-            int rightMargin = 0;
-            if (childViewLayoutParams instanceof MarginLayoutParams) {
-                leftMargin = ((MarginLayoutParams) childViewLayoutParams).leftMargin;
-                rightMargin = ((MarginLayoutParams) childViewLayoutParams).rightMargin;
-                if (leftMargin < 0) {
-                    leftMargin = 0;
-                }
-                if (rightMargin < 0) {
-                    rightMargin = 0;
-                }
-            }
-            int childViewWidth = childView.getMeasuredWidth() + leftMargin + rightMargin;
-            int childViewHeight = childView.getMeasuredHeight();
+            // 获取margin信息
+            ChildViewMarginSize marginSize = getChildViewMargin(childView);
+            int leftMargin = marginSize.getLeftMargin();
+            int rightMargin = marginSize.getRightMargin();
+            int topMargin = marginSize.getTopMargin();
+            int bottomMargin = marginSize.getBottomMargin();
 
+            int childViewWidth = childView.getMeasuredWidth() + leftMargin + rightMargin;
+            int childViewHeight = childView.getMeasuredHeight() + topMargin + bottomMargin;
             if (calculateWidth + childViewWidth > maxWidth) { // 超过了单行最大的宽度,需要换行
                 // 换行的时候更新left和top
                 resultWidth = Math.max(resultWidth, calculateWidth);
@@ -130,6 +123,33 @@ public class DynamicViewGroup extends ViewGroup {
         return new ResultSize(resultWidth, resultHeight);
     }
 
+    private ChildViewMarginSize getChildViewMargin(View childView) {
+        ViewGroup.LayoutParams childViewLayoutParams = childView.getLayoutParams();
+        int leftMargin = 0;
+        int rightMargin = 0;
+        int topMargin = 0;
+        int bottomMargin = 0;
+        if (childViewLayoutParams instanceof MarginLayoutParams) {
+            leftMargin = ((MarginLayoutParams) childViewLayoutParams).leftMargin;
+            rightMargin = ((MarginLayoutParams) childViewLayoutParams).rightMargin;
+            topMargin = ((MarginLayoutParams) childViewLayoutParams).topMargin;
+            bottomMargin = ((MarginLayoutParams) childViewLayoutParams).bottomMargin;
+            if (leftMargin < 0) {
+                leftMargin = 0;
+            }
+            if (rightMargin < 0) {
+                rightMargin = 0;
+            }
+            if (topMargin < 0) {
+                topMargin = 0;
+            }
+            if (bottomMargin < 0) {
+                bottomMargin = 0;
+            }
+        }
+        return new ChildViewMarginSize(leftMargin, topMargin, rightMargin, bottomMargin);
+    }
+
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         switch (mode) {
@@ -156,20 +176,15 @@ public class DynamicViewGroup extends ViewGroup {
             if (childView.getVisibility() == View.GONE) {
                 continue;
             }
-            int leftMargin = 0;
-            int rightMargin = 0;
-            if (childView.getLayoutParams() instanceof MarginLayoutParams) {
-                leftMargin = ((MarginLayoutParams) childView.getLayoutParams()).leftMargin;
-                rightMargin = ((MarginLayoutParams) childView.getLayoutParams()).rightMargin;
-                if (leftMargin < 0) {
-                    leftMargin = 0;
-                }
-                if (rightMargin < 0) {
-                    rightMargin = 0;
-                }
-            }
+
+            ChildViewMarginSize marginSize = getChildViewMargin(childView);
+            int leftMargin = marginSize.getLeftMargin();
+            int rightMargin = marginSize.getRightMargin();
+            int topMargin = marginSize.getTopMargin();
+            int bottomMargin = marginSize.getBottomMargin();
+
             int right = left + childView.getMeasuredWidth() + leftMargin;
-            int bottom = top + childView.getMeasuredHeight();
+            int bottom = top + childView.getMeasuredHeight() + topMargin;
             if (right > viewGroupWidth) {
                 // 不够位置，需要换行
                 top += maxHeightInThisLine;
@@ -177,17 +192,17 @@ public class DynamicViewGroup extends ViewGroup {
                 maxHeightInThisLine = 0;
                 // 换行后继续layout
                 right = left + childView.getMeasuredWidth() + leftMargin;
-                bottom = top + childView.getMeasuredHeight();
-                childView.layout(left + leftMargin, top, right, bottom);
+                bottom = top + childView.getMeasuredHeight() + topMargin;
+                childView.layout(left + leftMargin, top + topMargin, right, bottom);
                 left = right + rightMargin;
                 maxHeightInThisLine = Math.max(maxHeightInThisLine, childView.getMeasuredHeight());
                 if (top >= viewGroupHeight) {
                     break;
                 }
             } else { // 从左到右排列
-                childView.layout(left + leftMargin, top, right, bottom);
+                childView.layout(left + leftMargin, top + topMargin, right, bottom);
                 left = right + rightMargin;
-                maxHeightInThisLine = Math.max(maxHeightInThisLine, childView.getMeasuredHeight());
+                maxHeightInThisLine = Math.max(maxHeightInThisLine, childView.getMeasuredHeight() + topMargin + bottomMargin);
             }
         }
     }
@@ -223,6 +238,52 @@ public class DynamicViewGroup extends ViewGroup {
 
         public LayoutParams(ViewGroup.LayoutParams source) {
             super(source);
+        }
+    }
+
+    static class ChildViewMarginSize {
+        int leftMargin = 0;
+        int topMargin = 0;
+        int rightMargin = 0;
+        int bottomMargin = 0;
+
+        public ChildViewMarginSize(int leftMargin, int topMargin, int rightMargin, int bottomMargin) {
+            this.leftMargin = leftMargin;
+            this.topMargin = topMargin;
+            this.rightMargin = rightMargin;
+            this.bottomMargin = bottomMargin;
+        }
+
+        public int getLeftMargin() {
+            return leftMargin;
+        }
+
+        public void setLeftMargin(int leftMargin) {
+            this.leftMargin = leftMargin;
+        }
+
+        public int getRightMargin() {
+            return rightMargin;
+        }
+
+        public void setRightMargin(int rightMargin) {
+            this.rightMargin = rightMargin;
+        }
+
+        public int getTopMargin() {
+            return topMargin;
+        }
+
+        public void setTopMargin(int topMargin) {
+            this.topMargin = topMargin;
+        }
+
+        public int getBottomMargin() {
+            return bottomMargin;
+        }
+
+        public void setBottomMargin(int bottomMargin) {
+            this.bottomMargin = bottomMargin;
         }
     }
 

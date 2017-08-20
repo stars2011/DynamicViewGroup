@@ -71,8 +71,8 @@ public class DynamicViewGroup extends ViewGroup {
      * 获取计算好的尺寸
      */
     private ResultSize getMeasureResultSizeForHorizontal(int maxWidth, boolean widthBeMax, int maxHeight, boolean heightBeMax) {
-        int markLeft = 0;
-        int markTop = 0;
+        int resultWidth = 0;
+        int resultHeight = 0;
         int calculateWidth = 0;
         int calculateHeight = 0;
         int childCount = getChildCount();
@@ -84,11 +84,11 @@ public class DynamicViewGroup extends ViewGroup {
 
             if (calculateWidth + childViewWidth > maxWidth) { // 超过了单行最大的宽度,需要换行
                 // 换行的时候更新left和top
-                markLeft = Math.max(markLeft, calculateWidth);
-                markTop += calculateHeight;
-                if (markTop > maxHeight) {
+                resultWidth = Math.max(resultWidth, calculateWidth);
+                resultHeight += calculateHeight;
+                if (resultHeight > maxHeight) {
                     Log.e(TAG, "we have no room for view");
-                    return new ResultSize(markLeft, markTop);
+                    return new ResultSize(resultWidth, resultHeight);
                 }
                 calculateWidth = 0;
                 calculateHeight = 0;
@@ -96,19 +96,25 @@ public class DynamicViewGroup extends ViewGroup {
                 calculateWidth += childViewWidth;
                 calculateHeight = Math.max(calculateHeight, childViewHeight);
                 if (i == (childCount - 1)) { // 到了最后一个View了,即将返回，对Result赋值
-                    markLeft = Math.max(markLeft, calculateWidth);
-                    markTop += calculateHeight;
+                    resultWidth = Math.max(resultWidth, calculateWidth);
+                    resultHeight += calculateHeight;
                 }
             } else {
                 calculateWidth += childViewWidth;
                 calculateHeight = Math.max(calculateHeight, childViewHeight);
                 if (i == (childCount - 1)) { // 到了最后一个View了,即将返回，对Result赋值
-                    markLeft = Math.max(markLeft, calculateWidth);
-                    markTop += calculateHeight;
+                    resultWidth = Math.max(resultWidth, calculateWidth);
+                    resultHeight += calculateHeight;
                 }
             }
         }
-        return new ResultSize(markLeft, markTop);
+        if (widthBeMax) {
+            resultWidth = maxWidth;
+        }
+        if (heightBeMax) {
+            resultHeight = maxHeight;
+        }
+        return new ResultSize(resultWidth, resultHeight);
     }
 
     @Override

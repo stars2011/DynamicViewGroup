@@ -113,6 +113,18 @@ public class DynamicViewGroup extends ViewGroup {
 
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
+        switch (mode) {
+            case HORIZONTAL:
+                layoutHorizontal();
+                break;
+
+            case VERTICAL:
+                Log.e(TAG, "VERTICAL mode unsupported yet");
+                break;
+        }
+    }
+
+    private void layoutHorizontal() {
         int left = 0;
         int top = 0;
         int lastLine = 0;
@@ -128,10 +140,17 @@ public class DynamicViewGroup extends ViewGroup {
             }
             int right = left + childeView.getMeasuredWidth();
             int bottom = top + childeView.getMeasuredHeight();
-            if (right > viewGroupWidth) { // 不够位置，需要换行
+            if (right > viewGroupWidth) {
+                // 不够位置，需要换行
                 top += maxHeightInThisLine;
                 left = 0;
                 maxHeightInThisLine = 0;
+                // 换行后继续layout
+                right = left + childeView.getMeasuredWidth();
+                bottom = top + childeView.getMeasuredHeight();
+                childeView.layout(left, top, right, bottom);
+                left = right;
+                maxHeightInThisLine = Math.max(maxHeightInThisLine, childeView.getMeasuredHeight());
                 if (top >= viewGroupHeight) {
                     break;
                 }

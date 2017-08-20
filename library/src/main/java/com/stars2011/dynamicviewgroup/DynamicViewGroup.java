@@ -79,7 +79,20 @@ public class DynamicViewGroup extends ViewGroup {
         // 遍历子View计算宽高
         for (int i = 0; i < childCount; i++) {
             View childView = getChildAt(i);
-            int childViewWidth = childView.getMeasuredWidth();
+            ViewGroup.LayoutParams childViewLayoutParams = childView.getLayoutParams();
+            int leftMargin = 0;
+            int rightMargin = 0;
+            if (childViewLayoutParams instanceof MarginLayoutParams) {
+                leftMargin = ((MarginLayoutParams) childViewLayoutParams).leftMargin;
+                rightMargin = ((MarginLayoutParams) childViewLayoutParams).rightMargin;
+                if (leftMargin < 0) {
+                    leftMargin = 0;
+                }
+                if (rightMargin < 0) {
+                    rightMargin = 0;
+                }
+            }
+            int childViewWidth = childView.getMeasuredWidth() + leftMargin + rightMargin;
             int childViewHeight = childView.getMeasuredHeight();
 
             if (calculateWidth + childViewWidth > maxWidth) { // 超过了单行最大的宽度,需要换行
@@ -138,33 +151,78 @@ public class DynamicViewGroup extends ViewGroup {
         int viewGroupHeight = getMeasuredHeight();
         int childCount = getChildCount();
         int maxHeightInThisLine = 0;
-
         for (int i = 0; i < childCount; i++) {
-            View childeView = getChildAt(i);
-            if (childeView.getVisibility() == View.GONE) {
+            View childView = getChildAt(i);
+            if (childView.getVisibility() == View.GONE) {
                 continue;
             }
-            int right = left + childeView.getMeasuredWidth();
-            int bottom = top + childeView.getMeasuredHeight();
+            int leftMargin = 0;
+            int rightMargin = 0;
+            if (childView.getLayoutParams() instanceof MarginLayoutParams) {
+                leftMargin = ((MarginLayoutParams) childView.getLayoutParams()).leftMargin;
+                rightMargin = ((MarginLayoutParams) childView.getLayoutParams()).rightMargin;
+                if (leftMargin < 0) {
+                    leftMargin = 0;
+                }
+                if (rightMargin < 0) {
+                    rightMargin = 0;
+                }
+            }
+            int right = left + childView.getMeasuredWidth() + leftMargin;
+            int bottom = top + childView.getMeasuredHeight();
             if (right > viewGroupWidth) {
                 // 不够位置，需要换行
                 top += maxHeightInThisLine;
                 left = 0;
                 maxHeightInThisLine = 0;
                 // 换行后继续layout
-                right = left + childeView.getMeasuredWidth();
-                bottom = top + childeView.getMeasuredHeight();
-                childeView.layout(left, top, right, bottom);
-                left = right;
-                maxHeightInThisLine = Math.max(maxHeightInThisLine, childeView.getMeasuredHeight());
+                right = left + childView.getMeasuredWidth() + leftMargin;
+                bottom = top + childView.getMeasuredHeight();
+                childView.layout(left + leftMargin, top, right, bottom);
+                left = right + rightMargin;
+                maxHeightInThisLine = Math.max(maxHeightInThisLine, childView.getMeasuredHeight());
                 if (top >= viewGroupHeight) {
                     break;
                 }
             } else { // 从左到右排列
-                childeView.layout(left, top, right, bottom);
-                left = right;
-                maxHeightInThisLine = Math.max(maxHeightInThisLine, childeView.getMeasuredHeight());
+                childView.layout(left + leftMargin, top, right, bottom);
+                left = right + rightMargin;
+                maxHeightInThisLine = Math.max(maxHeightInThisLine, childView.getMeasuredHeight());
             }
+        }
+    }
+
+    @Override
+    public LayoutParams generateLayoutParams(AttributeSet attrs) {
+        return new LayoutParams(getContext(), attrs);
+    }
+
+    @Override
+    protected LayoutParams generateLayoutParams(ViewGroup.LayoutParams p) {
+        return new LayoutParams(p);
+    }
+
+    @Override
+    protected LayoutParams generateDefaultLayoutParams() {
+        return new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+    }
+
+    public static class LayoutParams extends MarginLayoutParams {
+
+        public LayoutParams(Context c, AttributeSet attrs) {
+            super(c, attrs);
+        }
+
+        public LayoutParams(int width, int height) {
+            super(width, height);
+        }
+
+        public LayoutParams(MarginLayoutParams source) {
+            super(source);
+        }
+
+        public LayoutParams(ViewGroup.LayoutParams source) {
+            super(source);
         }
     }
 

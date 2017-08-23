@@ -33,42 +33,54 @@ public class DynamicViewGroup extends ViewGroup {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        measureHorizontal(widthMeasureSpec, heightMeasureSpec);
+        measureDependOnMode(widthMeasureSpec, heightMeasureSpec);
     }
 
     /**
-     * 横向模式的测量方法
+     * 根据当前模式选择对应的测量模式并设置
      */
-    private void measureHorizontal(int widthMeasureSpec, int heightMeasureSpec) {
+    private void measureDependOnMode(int widthMeasureSpec, int heightMeasureSpec) {
         int widthMode = MeasureSpec.getMode(widthMeasureSpec);
         int widthSize = MeasureSpec.getSize(widthMeasureSpec);
         int heightMode = MeasureSpec.getMode(heightMeasureSpec);
         int heightSize = MeasureSpec.getSize(heightMeasureSpec);
         measureChildren(widthMeasureSpec, heightMeasureSpec);
-        if (widthMode == MeasureSpec.AT_MOST && heightMode == MeasureSpec.AT_MOST) { // 实现wrap_content
-            calculateSizeAndSetMeasuredDimension(widthSize, false, heightSize, false);
-        } else if (widthMode == MeasureSpec.AT_MOST) {
-            calculateSizeAndSetMeasuredDimension(widthSize, false, heightSize, true);
-        } else if (heightMode == MeasureSpec.AT_MOST) {
-            calculateSizeAndSetMeasuredDimension(widthSize, true, heightSize, false);
+        if (widthMode == MeasureSpec.AT_MOST && heightMode == MeasureSpec.AT_MOST) { // 宽高都是wrap_content
+            calculateSizeAndSetMeasuredDimensionDependOnMode(widthSize, false, heightSize, false);
+        } else if (widthMode == MeasureSpec.AT_MOST) { // 无论高是EXACTLY还是UNSPECIFIED，都直接使用heightSize
+            calculateSizeAndSetMeasuredDimensionDependOnMode(widthSize, false, heightSize, true);
+        } else if (heightMode == MeasureSpec.AT_MOST) { // 无论宽是EXACTLY还是UNSPECIFIED，都直接使用widthSize
+            calculateSizeAndSetMeasuredDimensionDependOnMode(widthSize, true, heightSize, false);
         }
     }
 
     /**
-     * 计算ViewGroup的尺寸，并设置
+     * 根据模式计算ViewGroup的尺寸，并设置
      *
      * @param maxWidth 最大宽度
      * @param widthBeMax 最后尺寸是否直接使用最大宽度（当此选项为真则表示宽度是已经固定的，不需要计算，传入参数为了给计算高度的时候提供一个边界）
      * @param maxHeight 最大高度
      * @param heightBeMax 最后尺寸是否直接使用最大高度（当此选项为真则表示高度是已经固定的，不需要计算，传入参数为了给计算宽度的时候提供一个边界）
      */
-    private void calculateSizeAndSetMeasuredDimension(int maxWidth, boolean widthBeMax, int maxHeight, boolean heightBeMax) {
-        ResultSize resultSize = getMeasureResultSizeForHorizontal(maxWidth, widthBeMax, maxHeight, heightBeMax);
+    private void calculateSizeAndSetMeasuredDimensionDependOnMode(int maxWidth, boolean widthBeMax, int maxHeight, boolean heightBeMax) {
+        ResultSize resultSize = null;
+        switch (mode) {
+            case HORIZONTAL:
+                resultSize = getMeasureResultSizeForHorizontal(maxWidth, widthBeMax, maxHeight, heightBeMax);
+                break;
+            case VERTICAL:
+                resultSize = getMeasureResultSizeForVertical(maxWidth, widthBeMax, maxHeight, heightBeMax);
+                break;
+        }
+        if (resultSize == null) {
+            Log.e(TAG, "resultSize null when calculateSize");
+            return;
+        }
         setMeasuredDimension(resultSize.getResultWidth(), resultSize.getResultHeight());
     }
 
     /**
-     * 获取计算好的尺寸
+     * 横向模式获取计算好的尺寸
      */
     private ResultSize getMeasureResultSizeForHorizontal(int maxWidth, boolean widthBeMax, int maxHeight, boolean heightBeMax) {
         int resultWidth = 0;
@@ -123,6 +135,63 @@ public class DynamicViewGroup extends ViewGroup {
         return new ResultSize(resultWidth, resultHeight);
     }
 
+    private ResultSize getMeasureResultSizeForVertical(int maxWidth, boolean widthBeMax, int maxHeight, boolean heightBeMax) {
+        int resultWidth = 0;
+        int resultHeight = 0;
+        int calculateWidth = 0;
+        int calculateHeight = 0;
+        int childCount = getChildCount();
+        // 遍历子View计算宽高
+        for (int i = 0; i < childCount; i++) {
+            View childView = getChildAt(i);
+            // 获取margin信息
+            ChildViewMarginSize marginSize = getChildViewMargin(childView);
+            int leftMargin = marginSize.getLeftMargin();
+            int rightMargin = marginSize.getRightMargin();
+            int topMargin = marginSize.getTopMargin();
+            int bottomMargin = marginSize.getBottomMargin();
+
+            int childViewWidth = childView.getMeasuredWidth() + leftMargin + rightMargin;
+            int childViewHeight = childView.getMeasuredHeight() + topMargin + bottomMargin;
+
+            if (calculateHeight + childViewHeight > maxHeight) { // 超过了单列最大的高度,需要换列
+                // 换列的时候更新left和top
+                resultHeight = Math.max(resultHeight, calculateHeight);
+                resultWidth += calculateWidth;
+                if (resultWidth > maxWidth) {
+                    Log.e(TAG, "we have no room for view");
+                    return new ResultSize(resultWidth, resultHeight);
+                }
+                calculateWidth = 0;
+                calculateHeight = 0;
+                // 继续做插入测量
+                calculateHeight += childViewHeight;
+                calculateWidth = Math.max(calculateWidth, childViewWidth);
+                if (i == (childCount - 1)) { // 到了最后一个View了,即将返回，对Result赋值
+                    resultHeight = Math.max(resultHeight, calculateHeight);
+                    resultWidth += calculateWidth;
+                }
+            } else {
+                calculateHeight += childViewHeight;
+                calculateWidth = Math.max(calculateWidth, childViewWidth);
+                if (i == (childCount - 1)) { // 到了最后一个View了,即将返回，对Result赋值
+                    resultHeight = Math.max(resultHeight, calculateHeight);
+                    resultWidth += calculateWidth;
+                }
+            }
+        }
+        if (widthBeMax) {
+            resultWidth = maxWidth;
+        }
+        if (heightBeMax) {
+            resultHeight = maxHeight;
+        }
+        return new ResultSize(resultWidth, resultHeight);
+    }
+
+    /**
+     * 获取子View左上右下边距
+     */
     private ChildViewMarginSize getChildViewMargin(View childView) {
         ViewGroup.LayoutParams childViewLayoutParams = childView.getLayoutParams();
         int leftMargin = 0;

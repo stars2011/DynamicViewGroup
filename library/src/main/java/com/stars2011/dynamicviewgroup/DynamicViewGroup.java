@@ -13,8 +13,8 @@ import android.view.ViewGroup;
 public class DynamicViewGroup extends ViewGroup {
 
     public static final String TAG = "DynamicViewGroup";
-    public static final int HORIZONTAL = 0;
-    public static final int VERTICAL = 1;
+    public static final int HORIZONTAL = 0; // 横向布局
+    public static final int VERTICAL = 1; // 竖向布局
 
     private int mode = HORIZONTAL;
 
@@ -227,11 +227,14 @@ public class DynamicViewGroup extends ViewGroup {
                 break;
 
             case VERTICAL:
-                Log.e(TAG, "VERTICAL mode unsupported yet");
+                layoutVertical();
                 break;
         }
     }
 
+    /**
+     * 根据横向布局模式layout子View
+     */
     private void layoutHorizontal() {
         int left = 0;
         int top = 0;
@@ -272,6 +275,54 @@ public class DynamicViewGroup extends ViewGroup {
                 childView.layout(left + leftMargin, top + topMargin, right, bottom);
                 left = right + rightMargin;
                 maxHeightInThisLine = Math.max(maxHeightInThisLine, childView.getMeasuredHeight() + topMargin + bottomMargin);
+            }
+        }
+    }
+
+    /**
+     * 根据竖向布局模式layout子View
+     */
+    private void layoutVertical() {
+        int left = 0;
+        int top = 0;
+        int lastLine = 0;
+        int viewGroupWidth = getMeasuredWidth();
+        int viewGroupHeight = getMeasuredHeight();
+        int childCount = getChildCount();
+        int maxWidthInThisColumn = 0;
+        for (int i = 0; i < childCount; i++) {
+            View childView = getChildAt(i);
+            if (childView.getVisibility() == View.GONE) {
+                continue;
+            }
+
+            ChildViewMarginSize marginSize = getChildViewMargin(childView);
+            int leftMargin = marginSize.getLeftMargin();
+            int rightMargin = marginSize.getRightMargin();
+            int topMargin = marginSize.getTopMargin();
+            int bottomMargin = marginSize.getBottomMargin();
+
+            int right = left + childView.getMeasuredWidth() + leftMargin;
+            int bottom = top + childView.getMeasuredHeight() + topMargin;
+
+            if (bottom > viewGroupHeight) {
+                // 不够位置，需要换列
+                left += maxWidthInThisColumn;
+                top = 0;
+                maxWidthInThisColumn = 0;
+                // 换列后继续layout
+                right = left + childView.getMeasuredWidth() + leftMargin;
+                bottom = top + childView.getMeasuredHeight() + topMargin;
+                childView.layout(left + leftMargin, top + topMargin, right, bottom);
+                top = bottom + bottomMargin;
+                maxWidthInThisColumn = Math.max(maxWidthInThisColumn, childView.getMeasuredWidth() + leftMargin + rightMargin);
+                if (left >= viewGroupWidth) {
+                    break;
+                }
+            } else { // 从上到下排列
+                childView.layout(left + leftMargin, top + topMargin, right, bottom);
+                top = bottom + bottomMargin;
+                maxWidthInThisColumn = Math.max(maxWidthInThisColumn, childView.getMeasuredWidth() + leftMargin + rightMargin);
             }
         }
     }

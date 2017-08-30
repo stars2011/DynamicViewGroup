@@ -16,7 +16,7 @@ public class DynamicViewGroup extends ViewGroup {
     public static final int HORIZONTAL = 0; // 横向布局
     public static final int VERTICAL = 1; // 竖向布局
 
-    private int mode = HORIZONTAL;
+    private int mode = VERTICAL;
 
     public DynamicViewGroup(Context context) {
         this(context, null);
@@ -126,6 +126,12 @@ public class DynamicViewGroup extends ViewGroup {
                 }
             }
         }
+
+        // 添加padding的计算
+        int[] resultWidthAndHeightAfterAddPadding = addPaddingToWidthAndHeight(resultWidth, maxWidth, resultHeight, maxHeight);
+        resultWidth = resultWidthAndHeightAfterAddPadding[0];
+        resultHeight = resultWidthAndHeightAfterAddPadding[1];
+
         if (widthBeMax) {
             resultWidth = maxWidth;
         }
@@ -135,6 +141,9 @@ public class DynamicViewGroup extends ViewGroup {
         return new ResultSize(resultWidth, resultHeight);
     }
 
+    /**
+     * 竖向模式获取计算好的尺寸
+     */
     private ResultSize getMeasureResultSizeForVertical(int maxWidth, boolean widthBeMax, int maxHeight, boolean heightBeMax) {
         int resultWidth = 0;
         int resultHeight = 0;
@@ -180,6 +189,12 @@ public class DynamicViewGroup extends ViewGroup {
                 }
             }
         }
+
+        // 添加padding的计算
+        int[] resultWidthAndHeightAfterAddPadding = addPaddingToWidthAndHeight(resultWidth, maxWidth, resultHeight, maxHeight);
+        resultWidth = resultWidthAndHeightAfterAddPadding[0];
+        resultHeight = resultWidthAndHeightAfterAddPadding[1];
+
         if (widthBeMax) {
             resultWidth = maxWidth;
         }
@@ -187,6 +202,26 @@ public class DynamicViewGroup extends ViewGroup {
             resultHeight = maxHeight;
         }
         return new ResultSize(resultWidth, resultHeight);
+    }
+
+    /**
+     * 计算ViewGroup宽高的时候为宽和高添加padding
+     * @param resultWidth 根据子View计算出的ViewGroup宽度
+     * @param maxWidth ViewGroup的最大宽度
+     * @param resultHeight 根据子View计算出的ViewGroup高度
+     * @param maxHeight ViewGroup的最大高度
+     * @return 包含两个元素的int数组，宽度的索引为0，高度的索引为1
+     */
+    private int[] addPaddingToWidthAndHeight(int resultWidth, int maxWidth, int resultHeight, int maxHeight) {
+        int addPaddingResultWidth = resultWidth + getPaddingLeft() + getPaddingRight();
+        int addPaddingResultHeight = resultHeight + getPaddingTop() + getPaddingBottom();
+        if (addPaddingResultWidth > maxWidth) {
+            addPaddingResultWidth = maxWidth;
+        }
+        if (addPaddingResultHeight > maxHeight) {
+            addPaddingResultHeight = maxHeight;
+        }
+        return new int[] { addPaddingResultWidth, addPaddingResultHeight };
     }
 
     /**
@@ -236,11 +271,11 @@ public class DynamicViewGroup extends ViewGroup {
      * 根据横向布局模式layout子View
      */
     private void layoutHorizontal() {
-        int left = 0;
-        int top = 0;
+        int left = 0 + getPaddingLeft();
+        int top = 0 + getPaddingTop();
         int lastLine = 0;
-        int viewGroupWidth = getMeasuredWidth();
-        int viewGroupHeight = getMeasuredHeight();
+        int viewGroupWidth = getMeasuredWidth() - getPaddingRight();
+        int viewGroupHeight = getMeasuredHeight() - getPaddingBottom();
         int childCount = getChildCount();
         int maxHeightInThisLine = 0;
         for (int i = 0; i < childCount; i++) {
@@ -283,11 +318,11 @@ public class DynamicViewGroup extends ViewGroup {
      * 根据竖向布局模式layout子View
      */
     private void layoutVertical() {
-        int left = 0;
-        int top = 0;
+        int left = 0 + getPaddingLeft();
+        int top = 0 + getPaddingTop();
         int lastLine = 0;
-        int viewGroupWidth = getMeasuredWidth();
-        int viewGroupHeight = getMeasuredHeight();
+        int viewGroupWidth = getMeasuredWidth() - getPaddingRight();
+        int viewGroupHeight = getMeasuredHeight() - getPaddingBottom();
         int childCount = getChildCount();
         int maxWidthInThisColumn = 0;
         for (int i = 0; i < childCount; i++) {

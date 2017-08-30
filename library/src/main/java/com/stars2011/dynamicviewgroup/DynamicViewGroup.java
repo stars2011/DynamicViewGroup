@@ -15,8 +15,11 @@ public class DynamicViewGroup extends ViewGroup {
     public static final String TAG = "DynamicViewGroup";
     public static final int HORIZONTAL = 0; // 横向布局
     public static final int VERTICAL = 1; // 竖向布局
+    public static final int NUM_NOT_SET = -1;
 
-    private int mode = VERTICAL;
+    private int mode = HORIZONTAL;
+    private int columnNum = NUM_NOT_SET;
+    private int lineNum = NUM_NOT_SET;
 
     public DynamicViewGroup(Context context) {
         this(context, null);
@@ -77,6 +80,106 @@ public class DynamicViewGroup extends ViewGroup {
             return;
         }
         setMeasuredDimension(resultSize.getResultWidth(), resultSize.getResultHeight());
+    }
+
+    private ResultSize getMeasureResultSize(int maxWidth, boolean widthBeMax, int maxHeight, boolean heightBeMax) {
+        CalculateSize calculateSize = new CalculateSize(0, 0, 0, 0, getChildCount(), maxWidth, maxHeight);
+        // 遍历子View计算宽高
+        for (int i = 0; i < calculateSize.getChildCount(); i++) {
+            View childView = getChildAt(i);
+            // 获取margin信息
+            ChildViewMarginSize marginSize = getChildViewMargin(childView);
+            int leftMargin = marginSize.getLeftMargin();
+            int rightMargin = marginSize.getRightMargin();
+            int topMargin = marginSize.getTopMargin();
+            int bottomMargin = marginSize.getBottomMargin();
+            // 记录子View的测量后的宽高
+            calculateSize.setChildViewWidth(childView.getMeasuredWidth() + leftMargin + rightMargin);
+            calculateSize.setChildViewHeight(childView.getMeasuredHeight() + topMargin + bottomMargin);
+
+            switch (mode) {
+                case HORIZONTAL:
+                    calculateSize = calculateForHorizontal(calculateSize, i);
+                    break;
+
+                case VERTICAL:
+                    calculateSize = calculateForVertical(calculateSize, i);
+                    break;
+            }
+        }
+        // 添加padding的计算
+        int[] resultWidthAndHeightAfterAddPadding =
+            addPaddingToWidthAndHeight(calculateSize.getResultWidth(), maxWidth, calculateSize.getResultHeight(), maxHeight);
+        calculateSize.setResultWidth(resultWidthAndHeightAfterAddPadding[0]);
+        calculateSize.setResultHeight(resultWidthAndHeightAfterAddPadding[1]);
+
+        if (widthBeMax) {
+            calculateSize.setResultWidth(maxWidth);
+        }
+        if (heightBeMax) {
+            calculateSize.setResultHeight(maxHeight);
+        }
+        return new ResultSize(calculateSize.getResultWidth(), calculateSize.getResultHeight());
+    }
+
+    private CalculateSize calculateForHorizontal(CalculateSize calculateSize, int index) {
+        if (calculateSize.getCalculateWidth() + calculateSize.getChildViewWidth() > calculateSize.getMaxWidth()) { // 超过了单行最大的宽度,需要换行
+            // 换行的时候更新left和top
+            calculateSize.setResultWidth(Math.max(calculateSize.getResultWidth(), calculateSize.getCalculateWidth()));
+            calculateSize.setResultHeight(calculateSize.getResultHeight() + calculateSize.getCalculateHeight());
+            if (calculateSize.getResultHeight() > calculateSize.getMaxHeight()) {
+                Log.e(TAG, "we have no room for view");
+                return calculateSize;
+            }
+            calculateSize.setCalculateWidth(0);
+            calculateSize.setCalculateHeight(0);
+            // 继续做插入测量
+            calculateSize.setCalculateWidth(calculateSize.getCalculateWidth() + calculateSize.getChildViewWidth());
+            calculateSize.setCalculateHeight(Math.max(calculateSize.getCalculateHeight(), calculateSize.getChildViewHeight()));
+            // 到了最后一个View了,即将返回，对Result赋值
+            if (index == (calculateSize.getChildCount() - 1)) {
+                calculateSize.setResultWidth(Math.max(calculateSize.getResultWidth(), calculateSize.getCalculateWidth()));
+                calculateSize.setResultHeight(calculateSize.getResultHeight() + calculateSize.getCalculateHeight());
+            }
+        } else {
+            calculateSize.setCalculateWidth(calculateSize.getCalculateWidth() + calculateSize.getChildViewWidth());
+            calculateSize.setCalculateHeight(Math.max(calculateSize.getCalculateHeight(), calculateSize.getChildViewHeight()));
+            // 到了最后一个View了,即将返回，对Result赋值
+            if (index == (calculateSize.getChildCount() - 1)) {
+                calculateSize.setResultWidth(Math.max(calculateSize.getResultWidth(), calculateSize.getCalculateWidth()));
+                calculateSize.setResultHeight(calculateSize.getResultHeight() + calculateSize.getCalculateHeight());
+            }
+        }
+        return calculateSize;
+    }
+
+    private CalculateSize calculateForVertical(CalculateSize calculateSize, int index) {
+        if (calculateSize.getCalculateHeight() + calculateSize.getChildViewHeight() > calculateSize.getMaxHeight()) { // 超过了单列最大的高度,需要换列
+            // 换列的时候更新left和top
+            calculateSize.setResultHeight(Math.max(calculateSize.getResultHeight(), calculateSize.getCalculateHeight()));
+            calculateSize.setResultWidth(calculateSize.getResultWidth() + calculateSize.getCalculateWidth());
+            if (calculateSize.getResultWidth() > calculateSize.getMaxWidth()) {
+                Log.e(TAG, "we have no room for view");
+                return calculateSize;
+            }
+            calculateSize.setCalculateWidth(0);
+            calculateSize.setCalculateHeight(0);
+            // 继续做插入测量
+            calculateSize.setCalculateHeight(calculateSize.getCalculateHeight() + calculateSize.getChildViewHeight());
+            calculateSize.setCalculateWidth(Math.max(calculateSize.getCalculateWidth(), calculateSize.getChildViewWidth()));
+            if (index == (calculateSize.getChildCount() - 1)) { // 到了最后一个View了,即将返回，对Result赋值
+                calculateSize.setResultHeight(Math.max(calculateSize.getResultHeight(), calculateSize.getCalculateHeight()));
+                calculateSize.setResultWidth(calculateSize.getResultWidth() + calculateSize.getCalculateWidth());
+            }
+        } else {
+            calculateSize.setCalculateHeight(calculateSize.getCalculateHeight() + calculateSize.getChildViewHeight());
+            calculateSize.setCalculateWidth(Math.max(calculateSize.getCalculateWidth(), calculateSize.getChildViewWidth()));
+            if (index == (calculateSize.getChildCount() - 1)) { // 到了最后一个View了,即将返回，对Result赋值
+                calculateSize.setResultHeight(Math.max(calculateSize.getResultHeight(), calculateSize.getCalculateHeight()));
+                calculateSize.setResultWidth(calculateSize.getResultWidth() + calculateSize.getCalculateWidth());
+            }
+        }
+        return calculateSize;
     }
 
     /**
@@ -204,8 +307,13 @@ public class DynamicViewGroup extends ViewGroup {
         return new ResultSize(resultWidth, resultHeight);
     }
 
+    private boolean isNewLineOrNewColumnByChildViewIndex() {
+        return false;
+    }
+
     /**
      * 计算ViewGroup宽高的时候为宽和高添加padding
+     *
      * @param resultWidth 根据子View计算出的ViewGroup宽度
      * @param maxWidth ViewGroup的最大宽度
      * @param resultHeight 根据子View计算出的ViewGroup高度
@@ -465,6 +573,106 @@ public class DynamicViewGroup extends ViewGroup {
 
         public void setResultHeight(int resultHeight) {
             this.resultHeight = resultHeight;
+        }
+    }
+
+    static class CalculateSize {
+        int resultWidth = 0;
+        int resultHeight = 0;
+        int calculateWidth = 0;
+        int calculateHeight = 0;
+        int childCount = 0;
+        int childViewWidth = 0;
+        int childViewHeight = 0;
+        int maxWidth = 0;
+        int maxHeight = 0;
+
+        public CalculateSize(int resultWidth,
+                             int resultHeight,
+                             int calculateWidth,
+                             int calculateHeight,
+                             int childCount,
+                             int maxWidth,
+                             int maxHeight) {
+            this.resultWidth = resultWidth;
+            this.resultHeight = resultHeight;
+            this.calculateWidth = calculateWidth;
+            this.calculateHeight = calculateHeight;
+            this.childCount = childCount;
+            this.maxWidth = maxWidth;
+            this.maxHeight = maxHeight;
+        }
+
+        public int getResultWidth() {
+            return resultWidth;
+        }
+
+        public void setResultWidth(int resultWidth) {
+            this.resultWidth = resultWidth;
+        }
+
+        public int getResultHeight() {
+            return resultHeight;
+        }
+
+        public void setResultHeight(int resultHeight) {
+            this.resultHeight = resultHeight;
+        }
+
+        public int getCalculateWidth() {
+            return calculateWidth;
+        }
+
+        public void setCalculateWidth(int calculateWidth) {
+            this.calculateWidth = calculateWidth;
+        }
+
+        public int getCalculateHeight() {
+            return calculateHeight;
+        }
+
+        public void setCalculateHeight(int calculateHeight) {
+            this.calculateHeight = calculateHeight;
+        }
+
+        public int getChildCount() {
+            return childCount;
+        }
+
+        public void setChildCount(int childCount) {
+            this.childCount = childCount;
+        }
+
+        public int getChildViewWidth() {
+            return childViewWidth;
+        }
+
+        public void setChildViewWidth(int childViewWidth) {
+            this.childViewWidth = childViewWidth;
+        }
+
+        public int getChildViewHeight() {
+            return childViewHeight;
+        }
+
+        public void setChildViewHeight(int childViewHeight) {
+            this.childViewHeight = childViewHeight;
+        }
+
+        public int getMaxWidth() {
+            return maxWidth;
+        }
+
+        public void setMaxWidth(int maxWidth) {
+            this.maxWidth = maxWidth;
+        }
+
+        public int getMaxHeight() {
+            return maxHeight;
+        }
+
+        public void setMaxHeight(int maxHeight) {
+            this.maxHeight = maxHeight;
         }
     }
 }

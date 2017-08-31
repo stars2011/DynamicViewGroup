@@ -17,7 +17,7 @@ public class DynamicViewGroup extends ViewGroup {
     public static final int VERTICAL = 1; // 竖向布局
     public static final int NUM_NOT_SET = -1;
 
-    private int mode = HORIZONTAL;
+    private int mode = VERTICAL;
     private int columnNum = NUM_NOT_SET;
     private int lineNum = NUM_NOT_SET;
 
@@ -67,14 +67,7 @@ public class DynamicViewGroup extends ViewGroup {
      */
     private void calculateSizeAndSetMeasuredDimensionDependOnMode(int maxWidth, boolean widthBeMax, int maxHeight, boolean heightBeMax) {
         ResultSize resultSize = null;
-        switch (mode) {
-            case HORIZONTAL:
-                resultSize = getMeasureResultSizeForHorizontal(maxWidth, widthBeMax, maxHeight, heightBeMax);
-                break;
-            case VERTICAL:
-                resultSize = getMeasureResultSizeForVertical(maxWidth, widthBeMax, maxHeight, heightBeMax);
-                break;
-        }
+        resultSize = getMeasureResultSize(maxWidth, widthBeMax, maxHeight, heightBeMax);
         if (resultSize == null) {
             Log.e(TAG, "resultSize null when calculateSize");
             return;
@@ -122,6 +115,9 @@ public class DynamicViewGroup extends ViewGroup {
         return new ResultSize(calculateSize.getResultWidth(), calculateSize.getResultHeight());
     }
 
+    /**
+     * 横向模式计算尺寸
+     */
     private CalculateSize calculateForHorizontal(CalculateSize calculateSize, int index) {
         if (calculateSize.getCalculateWidth() + calculateSize.getChildViewWidth() > calculateSize.getMaxWidth()) { // 超过了单行最大的宽度,需要换行
             // 换行的时候更新left和top
@@ -153,6 +149,9 @@ public class DynamicViewGroup extends ViewGroup {
         return calculateSize;
     }
 
+    /**
+     * 竖向模式计算尺寸
+     */
     private CalculateSize calculateForVertical(CalculateSize calculateSize, int index) {
         if (calculateSize.getCalculateHeight() + calculateSize.getChildViewHeight() > calculateSize.getMaxHeight()) { // 超过了单列最大的高度,需要换列
             // 换列的时候更新left和top
@@ -180,131 +179,6 @@ public class DynamicViewGroup extends ViewGroup {
             }
         }
         return calculateSize;
-    }
-
-    /**
-     * 横向模式获取计算好的尺寸
-     */
-    private ResultSize getMeasureResultSizeForHorizontal(int maxWidth, boolean widthBeMax, int maxHeight, boolean heightBeMax) {
-        int resultWidth = 0;
-        int resultHeight = 0;
-        int calculateWidth = 0;
-        int calculateHeight = 0;
-        int childCount = getChildCount();
-        // 遍历子View计算宽高
-        for (int i = 0; i < childCount; i++) {
-            View childView = getChildAt(i);
-            // 获取margin信息
-            ChildViewMarginSize marginSize = getChildViewMargin(childView);
-            int leftMargin = marginSize.getLeftMargin();
-            int rightMargin = marginSize.getRightMargin();
-            int topMargin = marginSize.getTopMargin();
-            int bottomMargin = marginSize.getBottomMargin();
-
-            int childViewWidth = childView.getMeasuredWidth() + leftMargin + rightMargin;
-            int childViewHeight = childView.getMeasuredHeight() + topMargin + bottomMargin;
-            if (calculateWidth + childViewWidth > maxWidth) { // 超过了单行最大的宽度,需要换行
-                // 换行的时候更新left和top
-                resultWidth = Math.max(resultWidth, calculateWidth);
-                resultHeight += calculateHeight;
-                if (resultHeight > maxHeight) {
-                    Log.e(TAG, "we have no room for view");
-                    return new ResultSize(resultWidth, resultHeight);
-                }
-                calculateWidth = 0;
-                calculateHeight = 0;
-                // 继续做插入测量
-                calculateWidth += childViewWidth;
-                calculateHeight = Math.max(calculateHeight, childViewHeight);
-                if (i == (childCount - 1)) { // 到了最后一个View了,即将返回，对Result赋值
-                    resultWidth = Math.max(resultWidth, calculateWidth);
-                    resultHeight += calculateHeight;
-                }
-            } else {
-                calculateWidth += childViewWidth;
-                calculateHeight = Math.max(calculateHeight, childViewHeight);
-                if (i == (childCount - 1)) { // 到了最后一个View了,即将返回，对Result赋值
-                    resultWidth = Math.max(resultWidth, calculateWidth);
-                    resultHeight += calculateHeight;
-                }
-            }
-        }
-
-        // 添加padding的计算
-        int[] resultWidthAndHeightAfterAddPadding = addPaddingToWidthAndHeight(resultWidth, maxWidth, resultHeight, maxHeight);
-        resultWidth = resultWidthAndHeightAfterAddPadding[0];
-        resultHeight = resultWidthAndHeightAfterAddPadding[1];
-
-        if (widthBeMax) {
-            resultWidth = maxWidth;
-        }
-        if (heightBeMax) {
-            resultHeight = maxHeight;
-        }
-        return new ResultSize(resultWidth, resultHeight);
-    }
-
-    /**
-     * 竖向模式获取计算好的尺寸
-     */
-    private ResultSize getMeasureResultSizeForVertical(int maxWidth, boolean widthBeMax, int maxHeight, boolean heightBeMax) {
-        int resultWidth = 0;
-        int resultHeight = 0;
-        int calculateWidth = 0;
-        int calculateHeight = 0;
-        int childCount = getChildCount();
-        // 遍历子View计算宽高
-        for (int i = 0; i < childCount; i++) {
-            View childView = getChildAt(i);
-            // 获取margin信息
-            ChildViewMarginSize marginSize = getChildViewMargin(childView);
-            int leftMargin = marginSize.getLeftMargin();
-            int rightMargin = marginSize.getRightMargin();
-            int topMargin = marginSize.getTopMargin();
-            int bottomMargin = marginSize.getBottomMargin();
-
-            int childViewWidth = childView.getMeasuredWidth() + leftMargin + rightMargin;
-            int childViewHeight = childView.getMeasuredHeight() + topMargin + bottomMargin;
-
-            if (calculateHeight + childViewHeight > maxHeight) { // 超过了单列最大的高度,需要换列
-                // 换列的时候更新left和top
-                resultHeight = Math.max(resultHeight, calculateHeight);
-                resultWidth += calculateWidth;
-                if (resultWidth > maxWidth) {
-                    Log.e(TAG, "we have no room for view");
-                    return new ResultSize(resultWidth, resultHeight);
-                }
-                calculateWidth = 0;
-                calculateHeight = 0;
-                // 继续做插入测量
-                calculateHeight += childViewHeight;
-                calculateWidth = Math.max(calculateWidth, childViewWidth);
-                if (i == (childCount - 1)) { // 到了最后一个View了,即将返回，对Result赋值
-                    resultHeight = Math.max(resultHeight, calculateHeight);
-                    resultWidth += calculateWidth;
-                }
-            } else {
-                calculateHeight += childViewHeight;
-                calculateWidth = Math.max(calculateWidth, childViewWidth);
-                if (i == (childCount - 1)) { // 到了最后一个View了,即将返回，对Result赋值
-                    resultHeight = Math.max(resultHeight, calculateHeight);
-                    resultWidth += calculateWidth;
-                }
-            }
-        }
-
-        // 添加padding的计算
-        int[] resultWidthAndHeightAfterAddPadding = addPaddingToWidthAndHeight(resultWidth, maxWidth, resultHeight, maxHeight);
-        resultWidth = resultWidthAndHeightAfterAddPadding[0];
-        resultHeight = resultWidthAndHeightAfterAddPadding[1];
-
-        if (widthBeMax) {
-            resultWidth = maxWidth;
-        }
-        if (heightBeMax) {
-            resultHeight = maxHeight;
-        }
-        return new ResultSize(resultWidth, resultHeight);
     }
 
     private boolean isNewLineOrNewColumnByChildViewIndex() {

@@ -17,9 +17,9 @@ public class DynamicViewGroup extends ViewGroup {
     public static final int VERTICAL = 1; // 竖向布局
     public static final int NUM_NOT_SET = -1;
 
-    private int mode = HORIZONTAL;
-    private int columnNum = NUM_NOT_SET;
-    private int lineNum = NUM_NOT_SET;
+    private int mode = VERTICAL;
+    private int maxColumnNum = NUM_NOT_SET; // 最大列数，当每行子View个数超过则自动换行（用于 HORIZONTAL 模式）
+    private int maxLineNum = NUM_NOT_SET; // 最大行数，当每列子View个数超过则自动换列（用于 VERTICAL 模式）
 
     public DynamicViewGroup(Context context) {
         this(context, null);
@@ -92,11 +92,11 @@ public class DynamicViewGroup extends ViewGroup {
 
             switch (mode) {
                 case HORIZONTAL:
-                    calculateSize = calculateForHorizontal(calculateSize, i);
+                    calculateSize = calculateForHorizontal(calculateSize, i, isNewLineOrNewColumnByChildViewIndex(i));
                     break;
 
                 case VERTICAL:
-                    calculateSize = calculateForVertical(calculateSize, i);
+                    calculateSize = calculateForVertical(calculateSize, i, isNewLineOrNewColumnByChildViewIndex(i));
                     break;
             }
         }
@@ -118,8 +118,9 @@ public class DynamicViewGroup extends ViewGroup {
     /**
      * 横向模式计算尺寸
      */
-    private CalculateSize calculateForHorizontal(CalculateSize calculateSize, int index) {
-        if (calculateSize.getCalculateWidth() + calculateSize.getChildViewWidth() > calculateSize.getMaxWidth()) { // 超过了单行最大的宽度,需要换行
+    private CalculateSize calculateForHorizontal(CalculateSize calculateSize, int index, boolean isForceNewLine) {
+        if (calculateSize.getCalculateWidth() + calculateSize.getChildViewWidth() > calculateSize.getMaxWidth()
+            || isForceNewLine) { // 超过了单行最大的宽度,需要换行
             // 换行的时候更新left和top
             calculateSize.setResultWidth(Math.max(calculateSize.getResultWidth(), calculateSize.getCalculateWidth()));
             calculateSize.setResultHeight(calculateSize.getResultHeight() + calculateSize.getCalculateHeight());
@@ -152,8 +153,9 @@ public class DynamicViewGroup extends ViewGroup {
     /**
      * 竖向模式计算尺寸
      */
-    private CalculateSize calculateForVertical(CalculateSize calculateSize, int index) {
-        if (calculateSize.getCalculateHeight() + calculateSize.getChildViewHeight() > calculateSize.getMaxHeight()) { // 超过了单列最大的高度,需要换列
+    private CalculateSize calculateForVertical(CalculateSize calculateSize, int index, boolean isForceNewColumn) {
+        if (calculateSize.getCalculateHeight() + calculateSize.getChildViewHeight() > calculateSize.getMaxHeight()
+            || isForceNewColumn) { // 超过了单列最大的高度,需要换列
             // 换列的时候更新left和top
             calculateSize.setResultHeight(Math.max(calculateSize.getResultHeight(), calculateSize.getCalculateHeight()));
             calculateSize.setResultWidth(calculateSize.getResultWidth() + calculateSize.getCalculateWidth());
@@ -181,8 +183,29 @@ public class DynamicViewGroup extends ViewGroup {
         return calculateSize;
     }
 
-    private boolean isNewLineOrNewColumnByChildViewIndex() {
-        return false;
+    private boolean isNewLineOrNewColumnByChildViewIndex(int childIndex) {
+        switch (mode) {
+            case HORIZONTAL:
+                if (maxColumnNum == NUM_NOT_SET) {
+                    return false;
+                }
+                if (childIndex == 0) {
+                    return false;
+                }
+                return (childIndex) % maxColumnNum == 0;
+
+            case VERTICAL:
+                if (maxLineNum == NUM_NOT_SET) {
+                    return false;
+                }
+                if (childIndex == 0) {
+                    return false;
+                }
+                return (childIndex) % maxLineNum == 0;
+
+            default:
+                return false;
+        }
     }
 
     /**
@@ -263,11 +286,11 @@ public class DynamicViewGroup extends ViewGroup {
             ChildViewMarginSize marginSize = getChildViewMargin(childView);
             switch (mode) {
                 case HORIZONTAL:
-                    layoutForHorizontal(childView, layoutSize, marginSize);
+                    layoutForHorizontal(childView, layoutSize, marginSize, isNewLineOrNewColumnByChildViewIndex(i));
                     break;
 
                 case VERTICAL:
-                    layoutForVertical(childView, layoutSize, marginSize);
+                    layoutForVertical(childView, layoutSize, marginSize, isNewLineOrNewColumnByChildViewIndex(i));
                     break;
             }
         }
@@ -276,7 +299,7 @@ public class DynamicViewGroup extends ViewGroup {
     /**
      * 根据横向布局模式layout子View
      */
-    private void layoutForHorizontal(View childView, LayoutSize layoutSize, ChildViewMarginSize marginSize) {
+    private void layoutForHorizontal(View childView, LayoutSize layoutSize, ChildViewMarginSize marginSize, boolean isForceNewLine) {
         int leftMargin = marginSize.getLeftMargin();
         int rightMargin = marginSize.getRightMargin();
         int topMargin = marginSize.getTopMargin();
@@ -284,7 +307,7 @@ public class DynamicViewGroup extends ViewGroup {
         int right = layoutSize.getLeft() + childView.getMeasuredWidth() + leftMargin;
         int bottom = layoutSize.getTop() + childView.getMeasuredHeight() + topMargin;
 
-        if (right > layoutSize.getViewGroupWidth()) {
+        if (right > layoutSize.getViewGroupWidth() || isForceNewLine) {
             // 不够位置，需要换行
             layoutSize.setTop(layoutSize.getTop() + layoutSize.getMaxHeightInThisLine());
             layoutSize.setLeft(0);
@@ -308,7 +331,7 @@ public class DynamicViewGroup extends ViewGroup {
     /**
      * 根据竖向布局模式layout子View
      */
-    private void layoutForVertical(View childView, LayoutSize layoutSize, ChildViewMarginSize marginSize) {
+    private void layoutForVertical(View childView, LayoutSize layoutSize, ChildViewMarginSize marginSize, boolean isForceNewColumn) {
         int leftMargin = marginSize.getLeftMargin();
         int rightMargin = marginSize.getRightMargin();
         int topMargin = marginSize.getTopMargin();
@@ -316,7 +339,7 @@ public class DynamicViewGroup extends ViewGroup {
         int right = layoutSize.getLeft() + childView.getMeasuredWidth() + leftMargin;
         int bottom = layoutSize.getTop() + childView.getMeasuredHeight() + topMargin;
 
-        if (bottom > layoutSize.getViewGroupHeight()) {
+        if (bottom > layoutSize.getViewGroupHeight() || isForceNewColumn) {
             // 不够位置，需要换列
             layoutSize.setLeft(layoutSize.getLeft() + layoutSize.getMaxWidthInThisColumn());
             layoutSize.setTop(0);

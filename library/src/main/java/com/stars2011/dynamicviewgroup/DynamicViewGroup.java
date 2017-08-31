@@ -249,6 +249,101 @@ public class DynamicViewGroup extends ViewGroup {
         }
     }
 
+    private void layoutDependOnMode() {
+        LayoutSize layoutSize = new LayoutSize(
+            0 + getPaddingLeft(),
+            0 + getPaddingTop(),
+            getMeasuredWidth() - getPaddingRight(),
+            getMeasuredHeight() - getPaddingBottom(),
+            getChildCount(),
+            0,
+            0
+        );
+
+        for (int i = 0; i < layoutSize.getChildCount(); i++) {
+            View childView = getChildAt(i);
+            if (childView.getVisibility() == View.GONE) {
+                continue;
+            }
+            ChildViewMarginSize marginSize = getChildViewMargin(childView);
+            switch (mode) {
+                case HORIZONTAL:
+                    layoutForHorizontal(childView, layoutSize, marginSize);
+                    break;
+
+                case VERTICAL:
+                    layoutForVertical(childView, layoutSize, marginSize);
+                    break;
+            }
+        }
+    }
+
+    private void layoutForHorizontal(View childView, LayoutSize layoutSize, ChildViewMarginSize marginSize) {
+        int leftMargin = marginSize.getLeftMargin();
+        int rightMargin = marginSize.getRightMargin();
+        int topMargin = marginSize.getTopMargin();
+        int bottomMargin = marginSize.getBottomMargin();
+        int right = layoutSize.getLeft() + childView.getMeasuredWidth() + leftMargin;
+        int bottom = layoutSize.getTop() + childView.getMeasuredHeight() + topMargin;
+        if (right > layoutSize.getViewGroupWidth()) {
+            // 不够位置，需要换行
+            layoutSize.setTop(layoutSize.getTop() + layoutSize.getMaxHeightInThisLine());
+            layoutSize.setLeft(0);
+            layoutSize.setMaxHeightInThisLine(0);
+            // 换行后继续layout
+            right = layoutSize.getLeft() + childView.getMeasuredWidth() + leftMargin;
+            bottom = layoutSize.getTop() + childView.getMeasuredHeight() + topMargin;
+            childView.layout(layoutSize.getLeft() + leftMargin, layoutSize.getTop() + topMargin, right, bottom);
+            layoutSize.setLeft(right + rightMargin);
+            layoutSize.setMaxHeightInThisLine(Math.max(layoutSize.getMaxHeightInThisLine(), childView.getMeasuredHeight()));
+            //if (top >= viewGroupHeight) {
+            //    break;
+            //}
+        } else { // 从左到右排列
+            childView.layout(layoutSize.getLeft() + leftMargin, layoutSize.getTop() + topMargin, right, bottom);
+            layoutSize.setLeft(right + rightMargin);
+            layoutSize.setMaxHeightInThisLine(Math.max(
+                layoutSize.getMaxHeightInThisLine(),
+                childView.getMeasuredHeight() + topMargin + bottomMargin
+            ));
+        }
+    }
+
+    private void layoutForVertical(View childView, LayoutSize layoutSize, ChildViewMarginSize marginSize) {
+        int leftMargin = marginSize.getLeftMargin();
+        int rightMargin = marginSize.getRightMargin();
+        int topMargin = marginSize.getTopMargin();
+        int bottomMargin = marginSize.getBottomMargin();
+        int right = layoutSize.getLeft() + childView.getMeasuredWidth() + leftMargin;
+        int bottom = layoutSize.getTop() + childView.getMeasuredHeight() + topMargin;
+
+        if (bottom > layoutSize.getViewGroupHeight()) {
+            // 不够位置，需要换列
+            layoutSize.setLeft(layoutSize.getLeft() + layoutSize.getMaxWidthInThisColumn());
+            layoutSize.setTop(0);
+            layoutSize.setMaxWidthInThisColumn(0);
+            // 换列后继续layout
+            right = layoutSize.getLeft() + childView.getMeasuredWidth() + leftMargin;
+            bottom = layoutSize.getTop() + childView.getMeasuredHeight() + topMargin;
+            childView.layout(layoutSize.getLeft() + leftMargin, layoutSize.getTop() + topMargin, right, bottom);
+            layoutSize.setTop(bottom + bottomMargin);
+            layoutSize.setMaxWidthInThisColumn(Math.max(
+                layoutSize.getMaxWidthInThisColumn(),
+                childView.getMeasuredWidth() + leftMargin + rightMargin
+            ));
+            //if (left >= viewGroupWidth) {
+            //    break;
+            //}
+        } else { // 从上到下排列
+            childView.layout(layoutSize.getLeft() + leftMargin, layoutSize.getTop() + topMargin, right, bottom);
+            layoutSize.setTop(bottom + bottomMargin);
+            layoutSize.setMaxWidthInThisColumn(Math.max(
+                layoutSize.getMaxWidthInThisColumn(),
+                childView.getMeasuredWidth() + leftMargin + rightMargin
+            ));
+        }
+    }
+
     /**
      * 根据横向布局模式layout子View
      */
@@ -547,6 +642,88 @@ public class DynamicViewGroup extends ViewGroup {
 
         public void setMaxHeight(int maxHeight) {
             this.maxHeight = maxHeight;
+        }
+    }
+
+    static class LayoutSize {
+        int left;
+        int top;
+        int viewGroupWidth;
+        int viewGroupHeight;
+        int childCount;
+        int maxWidthInThisColumn;
+        int maxHeightInThisLine;
+
+        public LayoutSize(int left,
+                          int top,
+                          int viewGroupWidth,
+                          int viewGroupHeight,
+                          int childCount,
+                          int maxWidthInThisColumn,
+                          int maxHeightInThisLine) {
+            this.left = left;
+            this.top = top;
+            this.viewGroupWidth = viewGroupWidth;
+            this.viewGroupHeight = viewGroupHeight;
+            this.childCount = childCount;
+            this.maxWidthInThisColumn = maxWidthInThisColumn;
+            this.maxHeightInThisLine = maxHeightInThisLine;
+        }
+
+        public int getLeft() {
+            return left;
+        }
+
+        public void setLeft(int left) {
+            this.left = left;
+        }
+
+        public int getTop() {
+            return top;
+        }
+
+        public void setTop(int top) {
+            this.top = top;
+        }
+
+        public int getViewGroupWidth() {
+            return viewGroupWidth;
+        }
+
+        public void setViewGroupWidth(int viewGroupWidth) {
+            this.viewGroupWidth = viewGroupWidth;
+        }
+
+        public int getViewGroupHeight() {
+            return viewGroupHeight;
+        }
+
+        public void setViewGroupHeight(int viewGroupHeight) {
+            this.viewGroupHeight = viewGroupHeight;
+        }
+
+        public int getChildCount() {
+            return childCount;
+        }
+
+        public void setChildCount(int childCount) {
+            this.childCount = childCount;
+        }
+
+        public int getMaxWidthInThisColumn() {
+            return maxWidthInThisColumn;
+        }
+
+        public void setMaxWidthInThisColumn(int maxWidthInThisColumn) {
+            this.maxWidthInThisColumn = maxWidthInThisColumn;
+        }
+
+        public int getMaxHeightInThisLine() {
+            return maxHeightInThisLine;
+        }
+
+        public void setMaxHeightInThisLine(int maxHeightInThisLine) {
+            this.maxHeightInThisLine = maxHeightInThisLine;
         }
     }
 }

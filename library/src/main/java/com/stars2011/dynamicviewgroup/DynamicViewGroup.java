@@ -17,7 +17,7 @@ public class DynamicViewGroup extends ViewGroup {
     public static final int VERTICAL = 1; // 竖向布局
     public static final int NUM_NOT_SET = -1;
 
-    private int mode = VERTICAL;
+    private int mode = HORIZONTAL;
     private int maxColumnNum = NUM_NOT_SET; // 最大列数，当每行子View个数超过则自动换行（用于 HORIZONTAL 模式）
     private int maxLineNum = NUM_NOT_SET; // 最大行数，当每列子View个数超过则自动换列（用于 VERTICAL 模式）
 
@@ -317,7 +317,10 @@ public class DynamicViewGroup extends ViewGroup {
             bottom = layoutSize.getTop() + childView.getMeasuredHeight() + topMargin;
             childView.layout(layoutSize.getLeft() + leftMargin, layoutSize.getTop() + topMargin, right, bottom);
             layoutSize.setLeft(right + rightMargin);
-            layoutSize.setMaxHeightInThisLine(Math.max(layoutSize.getMaxHeightInThisLine(), childView.getMeasuredHeight()));
+            layoutSize.setMaxHeightInThisLine(Math.max(
+                layoutSize.getMaxHeightInThisLine(),
+                childView.getMeasuredHeight() + topMargin + bottomMargin
+            ));
         } else { // 从左到右排列
             childView.layout(layoutSize.getLeft() + leftMargin, layoutSize.getTop() + topMargin, right, bottom);
             layoutSize.setLeft(right + rightMargin);

@@ -17,7 +17,7 @@ public class DynamicViewGroup extends ViewGroup {
     public static final int VERTICAL = 1; // 竖向布局
     public static final int NUM_NOT_SET = -1;
 
-    private int mode = VERTICAL;
+    private int mode = HORIZONTAL;
     private int columnNum = NUM_NOT_SET;
     private int lineNum = NUM_NOT_SET;
 
@@ -238,17 +238,12 @@ public class DynamicViewGroup extends ViewGroup {
 
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
-        switch (mode) {
-            case HORIZONTAL:
-                layoutHorizontal();
-                break;
-
-            case VERTICAL:
-                layoutVertical();
-                break;
-        }
+        layoutDependOnMode();
     }
 
+    /**
+     * 根据当前模式来layout
+     */
     private void layoutDependOnMode() {
         LayoutSize layoutSize = new LayoutSize(
             0 + getPaddingLeft(),
@@ -259,7 +254,7 @@ public class DynamicViewGroup extends ViewGroup {
             0,
             0
         );
-
+        // layout每一个子View
         for (int i = 0; i < layoutSize.getChildCount(); i++) {
             View childView = getChildAt(i);
             if (childView.getVisibility() == View.GONE) {
@@ -278,6 +273,9 @@ public class DynamicViewGroup extends ViewGroup {
         }
     }
 
+    /**
+     * 根据横向布局模式layout子View
+     */
     private void layoutForHorizontal(View childView, LayoutSize layoutSize, ChildViewMarginSize marginSize) {
         int leftMargin = marginSize.getLeftMargin();
         int rightMargin = marginSize.getRightMargin();
@@ -285,6 +283,7 @@ public class DynamicViewGroup extends ViewGroup {
         int bottomMargin = marginSize.getBottomMargin();
         int right = layoutSize.getLeft() + childView.getMeasuredWidth() + leftMargin;
         int bottom = layoutSize.getTop() + childView.getMeasuredHeight() + topMargin;
+
         if (right > layoutSize.getViewGroupWidth()) {
             // 不够位置，需要换行
             layoutSize.setTop(layoutSize.getTop() + layoutSize.getMaxHeightInThisLine());
@@ -296,9 +295,6 @@ public class DynamicViewGroup extends ViewGroup {
             childView.layout(layoutSize.getLeft() + leftMargin, layoutSize.getTop() + topMargin, right, bottom);
             layoutSize.setLeft(right + rightMargin);
             layoutSize.setMaxHeightInThisLine(Math.max(layoutSize.getMaxHeightInThisLine(), childView.getMeasuredHeight()));
-            //if (top >= viewGroupHeight) {
-            //    break;
-            //}
         } else { // 从左到右排列
             childView.layout(layoutSize.getLeft() + leftMargin, layoutSize.getTop() + topMargin, right, bottom);
             layoutSize.setLeft(right + rightMargin);
@@ -309,6 +305,9 @@ public class DynamicViewGroup extends ViewGroup {
         }
     }
 
+    /**
+     * 根据竖向布局模式layout子View
+     */
     private void layoutForVertical(View childView, LayoutSize layoutSize, ChildViewMarginSize marginSize) {
         int leftMargin = marginSize.getLeftMargin();
         int rightMargin = marginSize.getRightMargin();
@@ -331,9 +330,6 @@ public class DynamicViewGroup extends ViewGroup {
                 layoutSize.getMaxWidthInThisColumn(),
                 childView.getMeasuredWidth() + leftMargin + rightMargin
             ));
-            //if (left >= viewGroupWidth) {
-            //    break;
-            //}
         } else { // 从上到下排列
             childView.layout(layoutSize.getLeft() + leftMargin, layoutSize.getTop() + topMargin, right, bottom);
             layoutSize.setTop(bottom + bottomMargin);
@@ -341,101 +337,6 @@ public class DynamicViewGroup extends ViewGroup {
                 layoutSize.getMaxWidthInThisColumn(),
                 childView.getMeasuredWidth() + leftMargin + rightMargin
             ));
-        }
-    }
-
-    /**
-     * 根据横向布局模式layout子View
-     */
-    private void layoutHorizontal() {
-        int left = 0 + getPaddingLeft();
-        int top = 0 + getPaddingTop();
-        int lastLine = 0;
-        int viewGroupWidth = getMeasuredWidth() - getPaddingRight();
-        int viewGroupHeight = getMeasuredHeight() - getPaddingBottom();
-        int childCount = getChildCount();
-        int maxHeightInThisLine = 0;
-        for (int i = 0; i < childCount; i++) {
-            View childView = getChildAt(i);
-            if (childView.getVisibility() == View.GONE) {
-                continue;
-            }
-
-            ChildViewMarginSize marginSize = getChildViewMargin(childView);
-            int leftMargin = marginSize.getLeftMargin();
-            int rightMargin = marginSize.getRightMargin();
-            int topMargin = marginSize.getTopMargin();
-            int bottomMargin = marginSize.getBottomMargin();
-
-            int right = left + childView.getMeasuredWidth() + leftMargin;
-            int bottom = top + childView.getMeasuredHeight() + topMargin;
-            if (right > viewGroupWidth) {
-                // 不够位置，需要换行
-                top += maxHeightInThisLine;
-                left = 0;
-                maxHeightInThisLine = 0;
-                // 换行后继续layout
-                right = left + childView.getMeasuredWidth() + leftMargin;
-                bottom = top + childView.getMeasuredHeight() + topMargin;
-                childView.layout(left + leftMargin, top + topMargin, right, bottom);
-                left = right + rightMargin;
-                maxHeightInThisLine = Math.max(maxHeightInThisLine, childView.getMeasuredHeight());
-                if (top >= viewGroupHeight) {
-                    break;
-                }
-            } else { // 从左到右排列
-                childView.layout(left + leftMargin, top + topMargin, right, bottom);
-                left = right + rightMargin;
-                maxHeightInThisLine = Math.max(maxHeightInThisLine, childView.getMeasuredHeight() + topMargin + bottomMargin);
-            }
-        }
-    }
-
-    /**
-     * 根据竖向布局模式layout子View
-     */
-    private void layoutVertical() {
-        int left = 0 + getPaddingLeft();
-        int top = 0 + getPaddingTop();
-        int lastLine = 0;
-        int viewGroupWidth = getMeasuredWidth() - getPaddingRight();
-        int viewGroupHeight = getMeasuredHeight() - getPaddingBottom();
-        int childCount = getChildCount();
-        int maxWidthInThisColumn = 0;
-        for (int i = 0; i < childCount; i++) {
-            View childView = getChildAt(i);
-            if (childView.getVisibility() == View.GONE) {
-                continue;
-            }
-
-            ChildViewMarginSize marginSize = getChildViewMargin(childView);
-            int leftMargin = marginSize.getLeftMargin();
-            int rightMargin = marginSize.getRightMargin();
-            int topMargin = marginSize.getTopMargin();
-            int bottomMargin = marginSize.getBottomMargin();
-
-            int right = left + childView.getMeasuredWidth() + leftMargin;
-            int bottom = top + childView.getMeasuredHeight() + topMargin;
-
-            if (bottom > viewGroupHeight) {
-                // 不够位置，需要换列
-                left += maxWidthInThisColumn;
-                top = 0;
-                maxWidthInThisColumn = 0;
-                // 换列后继续layout
-                right = left + childView.getMeasuredWidth() + leftMargin;
-                bottom = top + childView.getMeasuredHeight() + topMargin;
-                childView.layout(left + leftMargin, top + topMargin, right, bottom);
-                top = bottom + bottomMargin;
-                maxWidthInThisColumn = Math.max(maxWidthInThisColumn, childView.getMeasuredWidth() + leftMargin + rightMargin);
-                if (left >= viewGroupWidth) {
-                    break;
-                }
-            } else { // 从上到下排列
-                childView.layout(left + leftMargin, top + topMargin, right, bottom);
-                top = bottom + bottomMargin;
-                maxWidthInThisColumn = Math.max(maxWidthInThisColumn, childView.getMeasuredWidth() + leftMargin + rightMargin);
-            }
         }
     }
 

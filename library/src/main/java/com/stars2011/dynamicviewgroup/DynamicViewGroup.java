@@ -19,10 +19,10 @@ public class DynamicViewGroup extends ViewGroup {
     public static final int GRAVITY_CENTER = 11; // 布局居中对齐
     public static final int NUM_NOT_SET = -1;
 
-    private int mode = HORIZONTAL;
-    private int gravity = GRAVITY_LEFT;
-    private int maxColumnNum = NUM_NOT_SET; // 最大列数，当每行子View个数超过则自动换行（用于 HORIZONTAL 模式）
-    private int maxLineNum = NUM_NOT_SET; // 最大行数，当每列子View个数超过则自动换列（用于 VERTICAL 模式）
+    private int mMode = HORIZONTAL;
+    private int mGravity = GRAVITY_LEFT;
+    private int mMaxColumnNum = NUM_NOT_SET; // 最大列数，当每行子View个数超过则自动换行（用于 HORIZONTAL 模式）
+    private int mMaxLineNum = NUM_NOT_SET; // 最大行数，当每列子View个数超过则自动换列（用于 VERTICAL 模式）
 
     public DynamicViewGroup(Context context) {
         this(context, null);
@@ -93,7 +93,7 @@ public class DynamicViewGroup extends ViewGroup {
             calculateSize.setChildViewWidth(childView.getMeasuredWidth() + leftMargin + rightMargin);
             calculateSize.setChildViewHeight(childView.getMeasuredHeight() + topMargin + bottomMargin);
 
-            switch (mode) {
+            switch (mMode) {
                 case HORIZONTAL:
                     calculateSize = calculateForHorizontal(calculateSize, i, isNewLineOrNewColumnByChildViewIndex(i));
                     break;
@@ -187,24 +187,24 @@ public class DynamicViewGroup extends ViewGroup {
     }
 
     private boolean isNewLineOrNewColumnByChildViewIndex(int childIndex) {
-        switch (mode) {
+        switch (mMode) {
             case HORIZONTAL:
-                if (maxColumnNum == NUM_NOT_SET) {
+                if (mMaxColumnNum == NUM_NOT_SET) {
                     return false;
                 }
                 if (childIndex == 0) {
                     return false;
                 }
-                return (childIndex) % maxColumnNum == 0;
+                return (childIndex) % mMaxColumnNum == 0;
 
             case VERTICAL:
-                if (maxLineNum == NUM_NOT_SET) {
+                if (mMaxLineNum == NUM_NOT_SET) {
                     return false;
                 }
                 if (childIndex == 0) {
                     return false;
                 }
-                return (childIndex) % maxLineNum == 0;
+                return (childIndex) % mMaxLineNum == 0;
 
             default:
                 return false;
@@ -287,7 +287,7 @@ public class DynamicViewGroup extends ViewGroup {
                 continue;
             }
             ChildViewMarginSize marginSize = getChildViewMargin(childView);
-            switch (mode) {
+            switch (mMode) {
                 case HORIZONTAL:
                     layoutForHorizontal(childView, layoutSize, marginSize, isNewLineOrNewColumnByChildViewIndex(i));
                     break;

@@ -15,9 +15,12 @@ public class DynamicViewGroup extends ViewGroup {
     public static final String TAG = "DynamicViewGroup";
     public static final int HORIZONTAL = 0; // 横向布局
     public static final int VERTICAL = 1; // 竖向布局
+    public static final int GRAVITY_LEFT = 10; // 布局左对齐
+    public static final int GRAVITY_CENTER = 11; // 布局居中对齐
     public static final int NUM_NOT_SET = -1;
 
     private int mode = HORIZONTAL;
+    private int gravity = GRAVITY_LEFT;
     private int maxColumnNum = NUM_NOT_SET; // 最大列数，当每行子View个数超过则自动换行（用于 HORIZONTAL 模式）
     private int maxLineNum = NUM_NOT_SET; // 最大行数，当每列子View个数超过则自动换列（用于 VERTICAL 模式）
 

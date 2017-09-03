@@ -5,6 +5,8 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by stars2011
@@ -23,6 +25,7 @@ public class DynamicViewGroup extends ViewGroup {
     private int mGravity = GRAVITY_LEFT;
     private int mMaxColumnNum = NUM_NOT_SET; // 最大列数，当每行子View个数超过则自动换行（用于 HORIZONTAL 模式）
     private int mMaxLineNum = NUM_NOT_SET; // 最大行数，当每列子View个数超过则自动换列（用于 VERTICAL 模式）
+    private List<View> childViewInThisLineOrColumn = new ArrayList<>();
 
     public DynamicViewGroup(Context context) {
         this(context, null);
@@ -289,7 +292,7 @@ public class DynamicViewGroup extends ViewGroup {
             ChildViewMarginSize marginSize = getChildViewMargin(childView);
             switch (mMode) {
                 case HORIZONTAL:
-                    layoutForHorizontal(childView, layoutSize, marginSize, isNewLineOrNewColumnByChildViewIndex(i));
+                    layoutForHorizontal(childView, layoutSize, marginSize, i, isNewLineOrNewColumnByChildViewIndex(i));
                     break;
 
                 case VERTICAL:
@@ -302,7 +305,11 @@ public class DynamicViewGroup extends ViewGroup {
     /**
      * 根据横向布局模式layout子View
      */
-    private void layoutForHorizontal(View childView, LayoutSize layoutSize, ChildViewMarginSize marginSize, boolean isForceNewLine) {
+    private void layoutForHorizontal(View childView,
+                                     LayoutSize layoutSize,
+                                     ChildViewMarginSize marginSize,
+                                     int childViewIndex,
+                                     boolean isForceNewLine) {
         int leftMargin = marginSize.getLeftMargin();
         int rightMargin = marginSize.getRightMargin();
         int topMargin = marginSize.getTopMargin();
@@ -311,6 +318,8 @@ public class DynamicViewGroup extends ViewGroup {
         int bottom = layoutSize.getTop() + childView.getMeasuredHeight() + topMargin;
 
         if (right > layoutSize.getViewGroupWidth() || isForceNewLine) {
+            // 换行的时候先根据gravity来调整当前行子View的位置
+            adjuestChildViewPositionDependOnGravityInHorizontalMode(childViewInThisLineOrColumn);
             // 不够位置，需要换行
             layoutSize.setTop(layoutSize.getTop() + layoutSize.getMaxHeightInThisLine());
             layoutSize.setLeft(0);
@@ -331,6 +340,10 @@ public class DynamicViewGroup extends ViewGroup {
                 layoutSize.getMaxHeightInThisLine(),
                 childView.getMeasuredHeight() + topMargin + bottomMargin
             ));
+        }
+        childViewInThisLineOrColumn.add(childView);
+        if (childViewIndex == getChildCount() - 1) {
+            adjuestChildViewPositionDependOnGravityInHorizontalMode(childViewInThisLineOrColumn);
         }
     }
 
@@ -366,6 +379,50 @@ public class DynamicViewGroup extends ViewGroup {
                 layoutSize.getMaxWidthInThisColumn(),
                 childView.getMeasuredWidth() + leftMargin + rightMargin
             ));
+        }
+    }
+
+    private void adjuestChildViewPositionDependOnGravityInHorizontalMode(List<View> childViewInThisLineOrColumn) {
+        switch (mGravity) {
+            case GRAVITY_LEFT:
+                // do nothing
+                break;
+
+            case GRAVITY_CENTER:
+                adjuestChildViewForGravityCenterInHorizontalMode(childViewInThisLineOrColumn);
+                break;
+        }
+        childViewInThisLineOrColumn.clear();
+    }
+
+    private void adjuestChildViewForGravityCenterInHorizontalMode(List<View> childViewInThisLineOrColumn) {
+        if (childViewInThisLineOrColumn == null || childViewInThisLineOrColumn.size() == 0) {
+            return;
+        }
+        int totalWidth = 0;
+        if (childViewInThisLineOrColumn.size() == 1) {
+            int originalWidth = childViewInThisLineOrColumn.get(0).getRight() - childViewInThisLineOrColumn.get(0).getLeft();
+            ChildViewMarginSize marginSize = getChildViewMargin(childViewInThisLineOrColumn.get(0));
+            int rightMargin = marginSize.getRightMargin();
+            int leftMargin = marginSize.getLeftMargin();
+            totalWidth = originalWidth + rightMargin + leftMargin;
+        } else {
+            int originalWidth =
+                childViewInThisLineOrColumn.get(childViewInThisLineOrColumn.size() - 1).getRight() - childViewInThisLineOrColumn.get(0).getLeft();
+            int firstChildViewLeftMargin = getChildViewMargin(childViewInThisLineOrColumn.get(0)).getLeftMargin();
+            int lastChildViewRightMargin =
+                getChildViewMargin(childViewInThisLineOrColumn.get(childViewInThisLineOrColumn.size() - 1)).getRightMargin();
+            totalWidth = originalWidth + firstChildViewLeftMargin + lastChildViewRightMargin;
+        }
+        // 最长的那行会触及边界所以要减去padding，其他的行是不需要管padding的
+        int viewGroupSpace = getMeasuredWidth() - getPaddingLeft() - getPaddingRight();
+        // 如果viewGroupSpace大于totalWidth表明这行不是最长的，所以不需要处理padding
+        if (viewGroupSpace > totalWidth) {
+            viewGroupSpace = getMeasuredWidth();
+        }
+        int leftOffset = (viewGroupSpace - totalWidth) / 2;
+        for (int i = 0; i < childViewInThisLineOrColumn.size(); i++) {
+            childViewInThisLineOrColumn.get(i).offsetLeftAndRight(leftOffset);
         }
     }
 

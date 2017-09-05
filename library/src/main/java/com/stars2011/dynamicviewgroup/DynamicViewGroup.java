@@ -21,7 +21,7 @@ public class DynamicViewGroup extends ViewGroup {
     public static final int GRAVITY_CENTER = 11; // 布局居中对齐
     public static final int NUM_NOT_SET = -1;
 
-    private int mMode = HORIZONTAL;
+    private int mMode = VERTICAL;
     private int mGravity = GRAVITY_LEFT;
     private int mMaxColumnNum = NUM_NOT_SET; // 最大列数，当每行子View个数超过则自动换行（用于 HORIZONTAL 模式）
     private int mMaxLineNum = NUM_NOT_SET; // 最大行数，当每列子View个数超过则自动换列（用于 VERTICAL 模式）
@@ -372,17 +372,17 @@ public class DynamicViewGroup extends ViewGroup {
             right = layoutSize.getLeft() + childView.getMeasuredWidth() + leftMargin;
             bottom = layoutSize.getTop() + childView.getMeasuredHeight() + topMargin;
             childView.layout(layoutSize.getLeft() + leftMargin, layoutSize.getTop() + topMargin, right, bottom);
-            layoutSize.setTop(bottom + bottomMargin);
+            layoutSize.setTop(bottom + bottomMargin + mVerticalSpacing);
             layoutSize.setMaxWidthInThisColumn(Math.max(
                 layoutSize.getMaxWidthInThisColumn(),
-                childView.getMeasuredWidth() + leftMargin + rightMargin
+                childView.getMeasuredWidth() + leftMargin + rightMargin + mHorizontalSpacing
             ));
         } else { // 从上到下排列
             childView.layout(layoutSize.getLeft() + leftMargin, layoutSize.getTop() + topMargin, right, bottom);
-            layoutSize.setTop(bottom + bottomMargin);
+            layoutSize.setTop(bottom + bottomMargin + mVerticalSpacing);
             layoutSize.setMaxWidthInThisColumn(Math.max(
                 layoutSize.getMaxWidthInThisColumn(),
-                childView.getMeasuredWidth() + leftMargin + rightMargin
+                childView.getMeasuredWidth() + leftMargin + rightMargin + mHorizontalSpacing
             ));
         }
     }

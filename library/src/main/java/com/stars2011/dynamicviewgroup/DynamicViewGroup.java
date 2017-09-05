@@ -336,14 +336,14 @@ public class DynamicViewGroup extends ViewGroup {
             layoutSize.setLeft(right + rightMargin + mHorizontalSpacing);
             layoutSize.setMaxHeightInThisLine(Math.max(
                 layoutSize.getMaxHeightInThisLine(),
-                childView.getMeasuredHeight() + topMargin + bottomMargin
+                childView.getMeasuredHeight() + topMargin + bottomMargin + mVerticalSpacing
             ));
         } else { // 从左到右排列
             childView.layout(layoutSize.getLeft() + leftMargin, layoutSize.getTop() + topMargin, right, bottom);
             layoutSize.setLeft(right + rightMargin + mHorizontalSpacing);
             layoutSize.setMaxHeightInThisLine(Math.max(
                 layoutSize.getMaxHeightInThisLine(),
-                childView.getMeasuredHeight() + topMargin + bottomMargin
+                childView.getMeasuredHeight() + topMargin + bottomMargin + mVerticalSpacing
             ));
         }
         childViewInThisLineOrColumn.add(childView);

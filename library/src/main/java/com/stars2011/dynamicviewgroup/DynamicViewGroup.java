@@ -25,6 +25,8 @@ public class DynamicViewGroup extends ViewGroup {
     private int mGravity = GRAVITY_LEFT;
     private int mMaxColumnNum = NUM_NOT_SET; // 最大列数，当每行子View个数超过则自动换行（用于 HORIZONTAL 模式）
     private int mMaxLineNum = NUM_NOT_SET; // 最大行数，当每列子View个数超过则自动换列（用于 VERTICAL 模式）
+    private int mHorizontalSpacing = 6;
+    private int mVerticalSpacing = 6;
     private List<View> childViewInThisLineOrColumn = new ArrayList<>();
 
     public DynamicViewGroup(Context context) {
@@ -93,8 +95,8 @@ public class DynamicViewGroup extends ViewGroup {
             int topMargin = marginSize.getTopMargin();
             int bottomMargin = marginSize.getBottomMargin();
             // 记录子View的测量后的宽高
-            calculateSize.setChildViewWidth(childView.getMeasuredWidth() + leftMargin + rightMargin);
-            calculateSize.setChildViewHeight(childView.getMeasuredHeight() + topMargin + bottomMargin);
+            calculateSize.setChildViewWidth(childView.getMeasuredWidth() + leftMargin + rightMargin + mHorizontalSpacing);
+            calculateSize.setChildViewHeight(childView.getMeasuredHeight() + topMargin + bottomMargin + mVerticalSpacing);
 
             switch (mMode) {
                 case HORIZONTAL:
@@ -106,6 +108,9 @@ public class DynamicViewGroup extends ViewGroup {
                     break;
             }
         }
+        // 处理额外多添加的横向间距和竖向
+        calculateSize.setResultWidth(calculateSize.getResultWidth() - mHorizontalSpacing);
+        calculateSize.setResultHeight(calculateSize.getResultHeight() - mVerticalSpacing);
         // 添加padding的计算
         int[] resultWidthAndHeightAfterAddPadding =
             addPaddingToWidthAndHeight(calculateSize.getResultWidth(), maxWidth, calculateSize.getResultHeight(), maxHeight);
@@ -328,14 +333,14 @@ public class DynamicViewGroup extends ViewGroup {
             right = layoutSize.getLeft() + childView.getMeasuredWidth() + leftMargin;
             bottom = layoutSize.getTop() + childView.getMeasuredHeight() + topMargin;
             childView.layout(layoutSize.getLeft() + leftMargin, layoutSize.getTop() + topMargin, right, bottom);
-            layoutSize.setLeft(right + rightMargin);
+            layoutSize.setLeft(right + rightMargin + mHorizontalSpacing);
             layoutSize.setMaxHeightInThisLine(Math.max(
                 layoutSize.getMaxHeightInThisLine(),
                 childView.getMeasuredHeight() + topMargin + bottomMargin
             ));
         } else { // 从左到右排列
             childView.layout(layoutSize.getLeft() + leftMargin, layoutSize.getTop() + topMargin, right, bottom);
-            layoutSize.setLeft(right + rightMargin);
+            layoutSize.setLeft(right + rightMargin + mHorizontalSpacing);
             layoutSize.setMaxHeightInThisLine(Math.max(
                 layoutSize.getMaxHeightInThisLine(),
                 childView.getMeasuredHeight() + topMargin + bottomMargin

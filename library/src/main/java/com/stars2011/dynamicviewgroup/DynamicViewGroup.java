@@ -21,7 +21,7 @@ public class DynamicViewGroup extends ViewGroup {
     public static final int GRAVITY_CENTER = 11; // 布局居中对齐
     public static final int NUM_NOT_SET = -1;
 
-    private int mMode = VERTICAL;
+    private int mMode = HORIZONTAL;
     private int mGravity = GRAVITY_LEFT;
     private int mMaxColumnNum = NUM_NOT_SET; // 最大列数，当每行子View个数超过则自动换行（用于 HORIZONTAL 模式）
     private int mMaxLineNum = NUM_NOT_SET; // 最大行数，当每列子View个数超过则自动换列（用于 VERTICAL 模式）
@@ -327,7 +327,7 @@ public class DynamicViewGroup extends ViewGroup {
             adjuestChildViewPositionDependOnGravityInHorizontalMode(childViewInThisLineOrColumn);
             // 不够位置，需要换行
             layoutSize.setTop(layoutSize.getTop() + layoutSize.getMaxHeightInThisLine());
-            layoutSize.setLeft(0);
+            layoutSize.setLeft(getPaddingLeft());
             layoutSize.setMaxHeightInThisLine(0);
             // 换行后继续layout
             right = layoutSize.getLeft() + childView.getMeasuredWidth() + leftMargin;
@@ -366,7 +366,7 @@ public class DynamicViewGroup extends ViewGroup {
         if (bottom > layoutSize.getViewGroupHeight() || isForceNewColumn) {
             // 不够位置，需要换列
             layoutSize.setLeft(layoutSize.getLeft() + layoutSize.getMaxWidthInThisColumn());
-            layoutSize.setTop(0);
+            layoutSize.setTop(getPaddingTop());
             layoutSize.setMaxWidthInThisColumn(0);
             // 换列后继续layout
             right = layoutSize.getLeft() + childView.getMeasuredWidth() + leftMargin;

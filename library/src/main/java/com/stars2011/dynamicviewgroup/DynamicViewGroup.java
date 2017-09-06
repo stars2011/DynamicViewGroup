@@ -173,7 +173,7 @@ public class DynamicViewGroup extends ViewGroup {
      * 竖向模式计算尺寸
      */
     private CalculateSize calculateForVertical(CalculateSize calculateSize, int index, boolean isForceNewColumn) {
-        if (calculateSize.getCalculateHeight() + calculateSize.getChildViewHeight() > calculateSize.getMaxHeight()
+        if (calculateSize.getCalculateHeight() + (calculateSize.getChildViewHeight() - mVerticalSpacing) > calculateSize.getMaxHeight()
             || isForceNewColumn) { // 超过了单列最大的高度,需要换列
             // 换列的时候更新left和top
             calculateSize.setResultHeight(Math.max(calculateSize.getResultHeight(), calculateSize.getCalculateHeight()));

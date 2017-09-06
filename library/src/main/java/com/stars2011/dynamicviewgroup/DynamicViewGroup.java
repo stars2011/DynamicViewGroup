@@ -84,7 +84,15 @@ public class DynamicViewGroup extends ViewGroup {
     }
 
     private ResultSize getMeasureResultSize(int maxWidth, boolean widthBeMax, int maxHeight, boolean heightBeMax) {
-        CalculateSize calculateSize = new CalculateSize(0, 0, 0, 0, getChildCount(), maxWidth, maxHeight);
+        CalculateSize calculateSize = new CalculateSize(
+            0,
+            0,
+            0,
+            0,
+            getChildCount(),
+            maxWidth - getPaddingLeft() - getPaddingRight(),
+            maxHeight - getPaddingTop() - getPaddingBottom()
+        );
         // 遍历子View计算宽高
         for (int i = 0; i < calculateSize.getChildCount(); i++) {
             View childView = getChildAt(i);
@@ -130,7 +138,7 @@ public class DynamicViewGroup extends ViewGroup {
      * 横向模式计算尺寸
      */
     private CalculateSize calculateForHorizontal(CalculateSize calculateSize, int index, boolean isForceNewLine) {
-        if (calculateSize.getCalculateWidth() + calculateSize.getChildViewWidth() > calculateSize.getMaxWidth()
+        if (calculateSize.getCalculateWidth() + (calculateSize.getChildViewWidth() - mHorizontalSpacing) > calculateSize.getMaxWidth()
             || isForceNewLine) { // 超过了单行最大的宽度,需要换行
             // 换行的时候更新left和top
             calculateSize.setResultWidth(Math.max(calculateSize.getResultWidth(), calculateSize.getCalculateWidth()));

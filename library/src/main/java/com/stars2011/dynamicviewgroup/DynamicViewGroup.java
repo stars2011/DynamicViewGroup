@@ -17,13 +17,15 @@ public class DynamicViewGroup extends ViewGroup {
     public static final String TAG = "DynamicViewGroup";
     public static final int HORIZONTAL = 0; // 横向布局
     public static final int VERTICAL = 1; // 竖向布局
-    public static final int GRAVITY_LEFT = 10; // 布局左对齐
-    public static final int GRAVITY_CENTER = 11; // 布局居中对齐
-    public static final int GRAVITY_RIGHT = 12; // 布局右对齐
+    public static final int GRAVITY_LEFT = 10; // 布局左对齐  (用于 HORIZONTAL 模式)
+    public static final int GRAVITY_RIGHT = 11; // 布局右对齐 (用于 HORIZONTAL 模式)
+    public static final int GRAVITY_CENTER = 12; // 布局居中对齐 (用于 HORIZONTAL 和 VERTICAL模式)
+    public static final int GRAVITY_TOP = 13; // 布局顶对齐 (用于 VERTICAL 模式)
+    public static final int GRAVITY_BOTTOM = 14; // 布局底对齐 (用于 VERTICAL 模式)
     public static final int NUM_NOT_SET = -1;
 
-    private int mMode = HORIZONTAL;
-    private int mGravity = GRAVITY_RIGHT;
+    private int mMode = VERTICAL;
+    private int mGravity = GRAVITY_CENTER;
     private int mMaxColumnNum = NUM_NOT_SET; // 最大列数，当每行子View个数超过则自动换行（用于 HORIZONTAL 模式）
     private int mMaxLineNum = NUM_NOT_SET; // 最大行数，当每列子View个数超过则自动换列（用于 VERTICAL 模式）
     private int mHorizontalSpacing = 6;
@@ -310,7 +312,7 @@ public class DynamicViewGroup extends ViewGroup {
                     break;
 
                 case VERTICAL:
-                    layoutForVertical(childView, layoutSize, marginSize, isNewLineOrNewColumnByChildViewIndex(i));
+                    layoutForVertical(childView, layoutSize, marginSize, i, isNewLineOrNewColumnByChildViewIndex(i));
                     break;
             }
         }
@@ -364,7 +366,11 @@ public class DynamicViewGroup extends ViewGroup {
     /**
      * 根据竖向布局模式layout子View
      */
-    private void layoutForVertical(View childView, LayoutSize layoutSize, ChildViewMarginSize marginSize, boolean isForceNewColumn) {
+    private void layoutForVertical(View childView,
+                                   LayoutSize layoutSize,
+                                   ChildViewMarginSize marginSize,
+                                   int childViewIndex,
+                                   boolean isForceNewColumn) {
         int leftMargin = marginSize.getLeftMargin();
         int rightMargin = marginSize.getRightMargin();
         int topMargin = marginSize.getTopMargin();
@@ -373,6 +379,8 @@ public class DynamicViewGroup extends ViewGroup {
         int bottom = layoutSize.getTop() + childView.getMeasuredHeight() + topMargin;
 
         if (bottom > layoutSize.getViewGroupHeight() || isForceNewColumn) {
+            // 换行的时候先根据gravity来调整当前行子View的位置
+            adjuestChildViewPositionDependOnGravityInVerticalMode(childViewInThisLineOrColumn);
             // 不够位置，需要换列
             layoutSize.setLeft(layoutSize.getLeft() + layoutSize.getMaxWidthInThisColumn());
             layoutSize.setTop(getPaddingTop());
@@ -393,6 +401,10 @@ public class DynamicViewGroup extends ViewGroup {
                 layoutSize.getMaxWidthInThisColumn(),
                 childView.getMeasuredWidth() + leftMargin + rightMargin + mHorizontalSpacing
             ));
+        }
+        childViewInThisLineOrColumn.add(childView);
+        if (childViewIndex == getChildCount() - 1) {
+            adjuestChildViewPositionDependOnGravityInVerticalMode(childViewInThisLineOrColumn);
         }
     }
 
@@ -454,6 +466,63 @@ public class DynamicViewGroup extends ViewGroup {
         }
         for (int i = 0; i < childViewInThisLineOrColumn.size(); i++) {
             childViewInThisLineOrColumn.get(i).offsetLeftAndRight(leftOffset);
+        }
+    }
+
+    private void adjuestChildViewPositionDependOnGravityInVerticalMode(List<View> childViewInThisLineOrColumn) {
+        switch (mGravity) {
+            case GRAVITY_TOP:
+                // do nothing
+                break;
+
+            case GRAVITY_CENTER:
+                adjustChildViewForGravityInVerticalMode(childViewInThisLineOrColumn);
+                break;
+
+            case GRAVITY_BOTTOM:
+                adjustChildViewForGravityInVerticalMode(childViewInThisLineOrColumn);
+                break;
+        }
+        childViewInThisLineOrColumn.clear();
+    }
+
+    private void adjustChildViewForGravityInVerticalMode(List<View> childViewInThisLineOrColumn) {
+        if (childViewInThisLineOrColumn == null || childViewInThisLineOrColumn.size() == 0) {
+            return;
+        }
+        int totalHeight = 0;
+        if (childViewInThisLineOrColumn.size() == 1) {
+            int originalHeight = childViewInThisLineOrColumn.get(0).getBottom() - childViewInThisLineOrColumn.get(0).getTop();
+            ChildViewMarginSize marginSize = getChildViewMargin(childViewInThisLineOrColumn.get(0));
+            int topMargin = marginSize.getTopMargin();
+            int bottomMargin = marginSize.getBottomMargin();
+            totalHeight = originalHeight + topMargin + bottomMargin;
+        } else {
+            int originalHeight =
+                childViewInThisLineOrColumn.get(childViewInThisLineOrColumn.size() - 1).getBottom() - childViewInThisLineOrColumn.get(0).getTop();
+            int firstChildViewTopMargin = getChildViewMargin(childViewInThisLineOrColumn.get(0)).getTopMargin();
+            int lastChildViewBottomMargin =
+                getChildViewMargin(childViewInThisLineOrColumn.get(childViewInThisLineOrColumn.size() - 1)).getBottomMargin();
+            totalHeight = originalHeight + firstChildViewTopMargin + lastChildViewBottomMargin;
+        }
+        // 最长的那行会触及边界所以要减去padding，其他的行是不需要管padding的
+        int viewGroupSpace = getMeasuredHeight() - getPaddingTop() - getPaddingBottom();
+        // 如果viewGroupSpace大于totalWidth表明这行不是最长的，所以不需要处理padding
+        if (viewGroupSpace > totalHeight) {
+            viewGroupSpace = getMeasuredHeight();
+        }
+        int topOffset = 0;
+        switch (mGravity) {
+            case GRAVITY_CENTER:
+                topOffset = (viewGroupSpace - totalHeight) / 2;
+                break;
+
+            case GRAVITY_BOTTOM:
+                topOffset = (viewGroupSpace - totalHeight);
+                break;
+        }
+        for (int i = 0; i < childViewInThisLineOrColumn.size(); i++) {
+            childViewInThisLineOrColumn.get(i).offsetTopAndBottom(topOffset);
         }
     }
 

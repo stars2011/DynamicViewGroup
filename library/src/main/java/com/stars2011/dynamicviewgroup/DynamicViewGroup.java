@@ -19,10 +19,11 @@ public class DynamicViewGroup extends ViewGroup {
     public static final int VERTICAL = 1; // 竖向布局
     public static final int GRAVITY_LEFT = 10; // 布局左对齐
     public static final int GRAVITY_CENTER = 11; // 布局居中对齐
+    public static final int GRAVITY_RIGHT = 12; // 布局右对齐
     public static final int NUM_NOT_SET = -1;
 
     private int mMode = HORIZONTAL;
-    private int mGravity = GRAVITY_LEFT;
+    private int mGravity = GRAVITY_RIGHT;
     private int mMaxColumnNum = NUM_NOT_SET; // 最大列数，当每行子View个数超过则自动换行（用于 HORIZONTAL 模式）
     private int mMaxLineNum = NUM_NOT_SET; // 最大行数，当每列子View个数超过则自动换列（用于 VERTICAL 模式）
     private int mHorizontalSpacing = 6;
@@ -402,13 +403,17 @@ public class DynamicViewGroup extends ViewGroup {
                 break;
 
             case GRAVITY_CENTER:
-                adjuestChildViewForGravityCenterInHorizontalMode(childViewInThisLineOrColumn);
+                adjuestChildViewForGravityInHorizontalMode(childViewInThisLineOrColumn);
+                break;
+
+            case GRAVITY_RIGHT:
+                adjuestChildViewForGravityInHorizontalMode(childViewInThisLineOrColumn);
                 break;
         }
         childViewInThisLineOrColumn.clear();
     }
 
-    private void adjuestChildViewForGravityCenterInHorizontalMode(List<View> childViewInThisLineOrColumn) {
+    private void adjuestChildViewForGravityInHorizontalMode(List<View> childViewInThisLineOrColumn) {
         if (childViewInThisLineOrColumn == null || childViewInThisLineOrColumn.size() == 0) {
             return;
         }
@@ -433,7 +438,20 @@ public class DynamicViewGroup extends ViewGroup {
         if (viewGroupSpace > totalWidth) {
             viewGroupSpace = getMeasuredWidth();
         }
-        int leftOffset = (viewGroupSpace - totalWidth) / 2;
+        int leftOffset = 0;
+        switch (mGravity) {
+            case GRAVITY_LEFT:
+                // do nothing
+                break;
+
+            case GRAVITY_CENTER:
+                leftOffset = (viewGroupSpace - totalWidth) / 2;
+                break;
+
+            case GRAVITY_RIGHT:
+                leftOffset = (viewGroupSpace - totalWidth);
+                break;
+        }
         for (int i = 0; i < childViewInThisLineOrColumn.size(); i++) {
             childViewInThisLineOrColumn.get(i).offsetLeftAndRight(leftOffset);
         }

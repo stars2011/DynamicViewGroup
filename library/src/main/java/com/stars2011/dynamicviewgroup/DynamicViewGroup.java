@@ -30,7 +30,7 @@ public class DynamicViewGroup extends ViewGroup {
     private int mMaxLineNum = NUM_NOT_SET; // 最大行数，当每列子View个数超过则自动换列（用于 VERTICAL 模式）
     private int mHorizontalSpacing = 6;
     private int mVerticalSpacing = 6;
-    private List<View> childViewInThisLineOrColumn = new ArrayList<>();
+    private List<View> mChildViewInThisLineOrColumn = new ArrayList<>();
 
     public DynamicViewGroup(Context context) {
         this(context, null);
@@ -335,7 +335,7 @@ public class DynamicViewGroup extends ViewGroup {
 
         if (right > layoutSize.getViewGroupWidth() || isForceNewLine) {
             // 换行的时候先根据gravity来调整当前行子View的位置
-            adjuestChildViewPositionDependOnGravityInHorizontalMode(childViewInThisLineOrColumn);
+            adjuestChildViewPositionDependOnGravityInHorizontalMode(mChildViewInThisLineOrColumn);
             // 不够位置，需要换行
             layoutSize.setTop(layoutSize.getTop() + layoutSize.getMaxHeightInThisLine());
             layoutSize.setLeft(getPaddingLeft());
@@ -357,9 +357,9 @@ public class DynamicViewGroup extends ViewGroup {
                 childView.getMeasuredHeight() + topMargin + bottomMargin + mVerticalSpacing
             ));
         }
-        childViewInThisLineOrColumn.add(childView);
+        mChildViewInThisLineOrColumn.add(childView);
         if (childViewIndex == getChildCount() - 1) {
-            adjuestChildViewPositionDependOnGravityInHorizontalMode(childViewInThisLineOrColumn);
+            adjuestChildViewPositionDependOnGravityInHorizontalMode(mChildViewInThisLineOrColumn);
         }
     }
 
@@ -380,7 +380,7 @@ public class DynamicViewGroup extends ViewGroup {
 
         if (bottom > layoutSize.getViewGroupHeight() || isForceNewColumn) {
             // 换行的时候先根据gravity来调整当前行子View的位置
-            adjuestChildViewPositionDependOnGravityInVerticalMode(childViewInThisLineOrColumn);
+            adjustChildViewPositionDependOnGravityInVerticalMode(mChildViewInThisLineOrColumn);
             // 不够位置，需要换列
             layoutSize.setLeft(layoutSize.getLeft() + layoutSize.getMaxWidthInThisColumn());
             layoutSize.setTop(getPaddingTop());
@@ -402,9 +402,9 @@ public class DynamicViewGroup extends ViewGroup {
                 childView.getMeasuredWidth() + leftMargin + rightMargin + mHorizontalSpacing
             ));
         }
-        childViewInThisLineOrColumn.add(childView);
+        mChildViewInThisLineOrColumn.add(childView);
         if (childViewIndex == getChildCount() - 1) {
-            adjuestChildViewPositionDependOnGravityInVerticalMode(childViewInThisLineOrColumn);
+            adjustChildViewPositionDependOnGravityInVerticalMode(mChildViewInThisLineOrColumn);
         }
     }
 
@@ -415,17 +415,17 @@ public class DynamicViewGroup extends ViewGroup {
                 break;
 
             case GRAVITY_CENTER:
-                adjuestChildViewForGravityInHorizontalMode(childViewInThisLineOrColumn);
+                adjustChildViewForGravityInHorizontalMode(childViewInThisLineOrColumn);
                 break;
 
             case GRAVITY_RIGHT:
-                adjuestChildViewForGravityInHorizontalMode(childViewInThisLineOrColumn);
+                adjustChildViewForGravityInHorizontalMode(childViewInThisLineOrColumn);
                 break;
         }
         childViewInThisLineOrColumn.clear();
     }
 
-    private void adjuestChildViewForGravityInHorizontalMode(List<View> childViewInThisLineOrColumn) {
+    private void adjustChildViewForGravityInHorizontalMode(List<View> childViewInThisLineOrColumn) {
         if (childViewInThisLineOrColumn == null || childViewInThisLineOrColumn.size() == 0) {
             return;
         }
@@ -469,7 +469,7 @@ public class DynamicViewGroup extends ViewGroup {
         }
     }
 
-    private void adjuestChildViewPositionDependOnGravityInVerticalMode(List<View> childViewInThisLineOrColumn) {
+    private void adjustChildViewPositionDependOnGravityInVerticalMode(List<View> childViewInThisLineOrColumn) {
         switch (mGravity) {
             case GRAVITY_TOP:
                 // do nothing

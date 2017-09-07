@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import java.util.ArrayList;
 import java.util.List;
 
+
 /**
  * Created by stars2011
  */
@@ -22,10 +23,11 @@ public class DynamicViewGroup extends ViewGroup {
     public static final int GRAVITY_CENTER = 12; // 布局居中对齐 (用于 HORIZONTAL 和 VERTICAL模式)
     public static final int GRAVITY_TOP = 13; // 布局顶对齐 (用于 VERTICAL 模式)
     public static final int GRAVITY_BOTTOM = 14; // 布局底对齐 (用于 VERTICAL 模式)
+    public static final int GRAVITY_BOTH = 15; // 双端对齐
     public static final int NUM_NOT_SET = -1;
 
     private int mMode = VERTICAL;
-    private int mGravity = GRAVITY_CENTER;
+    private int mGravity = GRAVITY_BOTH;
     private int mMaxColumnNum = NUM_NOT_SET; // 最大列数，当每行子View个数超过则自动换行（用于 HORIZONTAL 模式）
     private int mMaxLineNum = NUM_NOT_SET; // 最大行数，当每列子View个数超过则自动换列（用于 VERTICAL 模式）
     private int mHorizontalSpacing = 6;
@@ -421,6 +423,10 @@ public class DynamicViewGroup extends ViewGroup {
             case GRAVITY_RIGHT:
                 adjustChildViewForGravityInHorizontalMode(childViewInThisLineOrColumn);
                 break;
+
+            case GRAVITY_BOTH:
+                adjustChildViewForGravityBothInHorizontalMode(childViewInThisLineOrColumn);
+                break;
         }
         childViewInThisLineOrColumn.clear();
     }
@@ -469,6 +475,26 @@ public class DynamicViewGroup extends ViewGroup {
         }
     }
 
+    private void adjustChildViewForGravityBothInHorizontalMode(List<View> childViewInThisLineOrColumn) {
+        if (childViewInThisLineOrColumn == null || childViewInThisLineOrColumn.size() <= 1) {
+            return;
+        }
+        int viewGroupSpace = getMeasuredWidth() - getPaddingLeft() - getPaddingRight();
+        int totalViewWidth = 0;
+        for (int i = 0; i < childViewInThisLineOrColumn.size(); i++) {
+            totalViewWidth += childViewInThisLineOrColumn.get(i).getMeasuredWidth();
+        }
+        int space = (viewGroupSpace - totalViewWidth) / (childViewInThisLineOrColumn.size() - 1);
+        for (int i = 1; i < childViewInThisLineOrColumn.size(); i++) {
+            int lastViewRight = childViewInThisLineOrColumn.get(i - 1).getRight();
+            View childView = childViewInThisLineOrColumn.get(i);
+            int width = childView.getMeasuredWidth();
+            int newLeft = lastViewRight + space;
+            int newRight = newLeft + width;
+            childViewInThisLineOrColumn.get(i).layout(newLeft, childView.getTop(), newRight, childView.getBottom());
+        }
+    }
+
     private void adjustChildViewPositionDependOnGravityInVerticalMode(List<View> childViewInThisLineOrColumn) {
         switch (mGravity) {
             case GRAVITY_TOP:
@@ -481,6 +507,10 @@ public class DynamicViewGroup extends ViewGroup {
 
             case GRAVITY_BOTTOM:
                 adjustChildViewForGravityInVerticalMode(childViewInThisLineOrColumn);
+                break;
+
+            case GRAVITY_BOTH:
+                adjustChildViewForGravityBothInVerticalMode(childViewInThisLineOrColumn);
                 break;
         }
         childViewInThisLineOrColumn.clear();
@@ -523,6 +553,26 @@ public class DynamicViewGroup extends ViewGroup {
         }
         for (int i = 0; i < childViewInThisLineOrColumn.size(); i++) {
             childViewInThisLineOrColumn.get(i).offsetTopAndBottom(topOffset);
+        }
+    }
+
+    private void adjustChildViewForGravityBothInVerticalMode(List<View> childViewInThisLineOrColumn) {
+        if (childViewInThisLineOrColumn == null || childViewInThisLineOrColumn.size() <= 1) {
+            return;
+        }
+        int viewGroupSpace = getMeasuredHeight() - getPaddingTop() - getPaddingBottom();
+        int totalViewHeight = 0;
+        for (int i = 0; i < childViewInThisLineOrColumn.size(); i++) {
+            totalViewHeight += childViewInThisLineOrColumn.get(i).getMeasuredHeight();
+        }
+        int space = (viewGroupSpace - totalViewHeight) / (childViewInThisLineOrColumn.size() - 1);
+        for (int i = 1; i < childViewInThisLineOrColumn.size(); i++) {
+            int lastViewBottom = childViewInThisLineOrColumn.get(i - 1).getBottom();
+            View childView = childViewInThisLineOrColumn.get(i);
+            int height = childView.getMeasuredHeight();
+            int newTop = lastViewBottom + space;
+            int newBottom = newTop + height;
+            childViewInThisLineOrColumn.get(i).layout(childView.getLeft(), newTop, childView.getRight(), newBottom);
         }
     }
 

@@ -1,13 +1,15 @@
 package com.stars2011.dynamicviewgroup;
 
 import android.content.Context;
+import android.support.annotation.IntDef;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.List;
-
 
 /**
  * Created by stars2011
@@ -16,17 +18,30 @@ import java.util.List;
 public class DynamicViewGroup extends ViewGroup {
 
     public static final String TAG = "DynamicViewGroup";
+
+    @IntDef({ HORIZONTAL, VERTICAL })
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface OrientationMode {
+    }
+
     public static final int HORIZONTAL = 0; // 横向布局
     public static final int VERTICAL = 1; // 竖向布局
+
+    @IntDef({ GRAVITY_LEFT, GRAVITY_RIGHT, GRAVITY_CENTER, GRAVITY_TOP, GRAVITY_BOTTOM, GRAVITY_BOTH })
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface GravityMode {
+    }
+
     public static final int GRAVITY_LEFT = 10; // 布局左对齐  (用于 HORIZONTAL 模式)
     public static final int GRAVITY_RIGHT = 11; // 布局右对齐 (用于 HORIZONTAL 模式)
     public static final int GRAVITY_CENTER = 12; // 布局居中对齐 (用于 HORIZONTAL 和 VERTICAL模式)
     public static final int GRAVITY_TOP = 13; // 布局顶对齐 (用于 VERTICAL 模式)
     public static final int GRAVITY_BOTTOM = 14; // 布局底对齐 (用于 VERTICAL 模式)
     public static final int GRAVITY_BOTH = 15; // 双端对齐
+
     public static final int NUM_NOT_SET = -1;
 
-    private int mMode = VERTICAL;
+    private int mOrientation = VERTICAL;
     private int mGravity = GRAVITY_BOTH;
     private int mMaxColumnNum = NUM_NOT_SET; // 最大列数，当每行子View个数超过则自动换行（用于 HORIZONTAL 模式）
     private int mMaxLineNum = NUM_NOT_SET; // 最大行数，当每列子View个数超过则自动换列（用于 VERTICAL 模式）
@@ -44,6 +59,54 @@ public class DynamicViewGroup extends ViewGroup {
 
     public DynamicViewGroup(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+    }
+
+    public int getOrientation() {
+        return mOrientation;
+    }
+
+    public void setOrientation(@OrientationMode int orientation) {
+        this.mOrientation = orientation;
+    }
+
+    public int getGravity() {
+        return mGravity;
+    }
+
+    public void setGravity(@GravityMode int gravity) {
+        this.mGravity = gravity;
+    }
+
+    public int getMaxColumnNum() {
+        return mMaxColumnNum;
+    }
+
+    public void setMaxColumnNum(int maxColumnNum) {
+        this.mMaxColumnNum = maxColumnNum;
+    }
+
+    public int getMaxLineNum() {
+        return mMaxLineNum;
+    }
+
+    public void setMaxLineNum(int maxLineNum) {
+        this.mMaxLineNum = maxLineNum;
+    }
+
+    public int getHorizontalSpacing() {
+        return mHorizontalSpacing;
+    }
+
+    public void setHorizontalSpacing(int horizontalSpacing) {
+        this.mHorizontalSpacing = horizontalSpacing;
+    }
+
+    public int getVerticalSpacing() {
+        return mVerticalSpacing;
+    }
+
+    public void setVerticalSpacing(int verticalSpacing) {
+        this.mVerticalSpacing = verticalSpacing;
     }
 
     @Override
@@ -111,7 +174,7 @@ public class DynamicViewGroup extends ViewGroup {
             calculateSize.setChildViewWidth(childView.getMeasuredWidth() + leftMargin + rightMargin + mHorizontalSpacing);
             calculateSize.setChildViewHeight(childView.getMeasuredHeight() + topMargin + bottomMargin + mVerticalSpacing);
 
-            switch (mMode) {
+            switch (mOrientation) {
                 case HORIZONTAL:
                     calculateSize = calculateForHorizontal(calculateSize, i, isNewLineOrNewColumnByChildViewIndex(i));
                     break;
@@ -208,7 +271,7 @@ public class DynamicViewGroup extends ViewGroup {
     }
 
     private boolean isNewLineOrNewColumnByChildViewIndex(int childIndex) {
-        switch (mMode) {
+        switch (mOrientation) {
             case HORIZONTAL:
                 if (mMaxColumnNum == NUM_NOT_SET) {
                     return false;
@@ -308,7 +371,7 @@ public class DynamicViewGroup extends ViewGroup {
                 continue;
             }
             ChildViewMarginSize marginSize = getChildViewMargin(childView);
-            switch (mMode) {
+            switch (mOrientation) {
                 case HORIZONTAL:
                     layoutForHorizontal(childView, layoutSize, marginSize, i, isNewLineOrNewColumnByChildViewIndex(i));
                     break;

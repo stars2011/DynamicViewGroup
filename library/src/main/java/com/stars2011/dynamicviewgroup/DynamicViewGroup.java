@@ -41,12 +41,12 @@ public class DynamicViewGroup extends ViewGroup {
 
     public static final int NUM_NOT_SET = -1;
 
-    private int mOrientation = VERTICAL;
-    private int mGravity = GRAVITY_BOTH;
+    private int mOrientation = HORIZONTAL;
+    private int mGravity = GRAVITY_LEFT;
     private int mMaxColumnNum = NUM_NOT_SET; // 最大列数，当每行子View个数超过则自动换行（用于 HORIZONTAL 模式）
     private int mMaxLineNum = NUM_NOT_SET; // 最大行数，当每列子View个数超过则自动换列（用于 VERTICAL 模式）
-    private int mHorizontalSpacing = 6;
-    private int mVerticalSpacing = 6;
+    private int mHorizontalSpacing = 0;
+    private int mVerticalSpacing = 0;
     private List<View> mChildViewInThisLineOrColumn = new ArrayList<>();
 
     public DynamicViewGroup(Context context) {

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="DynamicViewGroup">
+        <attr name="orientation" format="integer">
+            <enum name="horizontal" value="0" />
+            <enum name="vertical" value="1" />
+        </attr>
+        <attr name="gravity" format="integer">
+            <enum name="gravity_left" value="10" />
+            <enum name="gravity_right" value="11" />
+            <enum name="gravity_center" value="12" />
+            <enum name="gravity_top" value="13" />
+            <enum name="gravity_bottom" value="14" />
+            <enum name="gravity_both" value="15" />
+        </attr>
+        <attr name="max_column_num" format="integer" />
+        <attr name="max_line_num" format="integer" />
+        <attr name="horizontal_spacing" format="dimension" />
+        <attr name="vertical_spacing" format="dimension" />
+    </declare-styleable>
+</resources>

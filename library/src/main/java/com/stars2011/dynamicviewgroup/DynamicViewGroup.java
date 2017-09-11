@@ -1,6 +1,7 @@
 package com.stars2011.dynamicviewgroup;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.support.annotation.IntDef;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -59,6 +60,17 @@ public class DynamicViewGroup extends ViewGroup {
 
     public DynamicViewGroup(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        init(context, attrs, defStyleAttr);
+    }
+
+    private void init(Context context, AttributeSet attrs, int defStyleAttr) {
+        TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.DynamicViewGroup, defStyleAttr, 0);
+        mOrientation = typedArray.getInt(R.styleable.DynamicViewGroup_orientation, HORIZONTAL);
+        mGravity = typedArray.getInt(R.styleable.DynamicViewGroup_gravity, GRAVITY_LEFT);
+        mMaxColumnNum = typedArray.getInt(R.styleable.DynamicViewGroup_max_column_num, NUM_NOT_SET);
+        mMaxLineNum = typedArray.getInt(R.styleable.DynamicViewGroup_max_line_num, NUM_NOT_SET);
+        mHorizontalSpacing = (int) (typedArray.getDimension(R.styleable.DynamicViewGroup_horizontal_spacing, 0.0f));
+        mVerticalSpacing = (int) (typedArray.getDimension(R.styleable.DynamicViewGroup_vertical_spacing, 0.0f));
     }
 
     public int getOrientation() {

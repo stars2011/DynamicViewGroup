@@ -49,6 +49,7 @@ public class DynamicViewGroup extends ViewGroup {
     private int mHorizontalSpacing = 0;
     private int mVerticalSpacing = 0;
     private List<View> mChildViewInThisLineOrColumn = new ArrayList<>();
+    private List<View> mChildViewInThisLineOrColumnForMeasure = new ArrayList<>();
 
     public DynamicViewGroup(Context context) {
         this(context, null);
@@ -188,11 +189,13 @@ public class DynamicViewGroup extends ViewGroup {
 
             switch (mOrientation) {
                 case HORIZONTAL:
-                    calculateSize = calculateForHorizontal(calculateSize, i, isNewLineOrNewColumnByChildViewIndex(i));
+                    calculateSize =
+                        calculateForHorizontal(calculateSize, i, isNewLineOrNewColumnByChildViewIndex(mChildViewInThisLineOrColumnForMeasure.size()));
                     break;
 
                 case VERTICAL:
-                    calculateSize = calculateForVertical(calculateSize, i, isNewLineOrNewColumnByChildViewIndex(i));
+                    calculateSize =
+                        calculateForVertical(calculateSize, i, isNewLineOrNewColumnByChildViewIndex(mChildViewInThisLineOrColumnForMeasure.size()));
                     break;
             }
         }
@@ -220,6 +223,8 @@ public class DynamicViewGroup extends ViewGroup {
     private CalculateSize calculateForHorizontal(CalculateSize calculateSize, int index, boolean isForceNewLine) {
         if (calculateSize.getCalculateWidth() + (calculateSize.getChildViewWidth() - mHorizontalSpacing) > calculateSize.getMaxWidth()
             || isForceNewLine) { // 超过了单行最大的宽度,需要换行
+            // 换行的时候就清理上一行的数据
+            mChildViewInThisLineOrColumnForMeasure.clear();
             // 换行的时候更新left和top
             calculateSize.setResultWidth(Math.max(calculateSize.getResultWidth(), calculateSize.getCalculateWidth()));
             calculateSize.setResultHeight(calculateSize.getResultHeight() + calculateSize.getCalculateHeight());
@@ -246,6 +251,10 @@ public class DynamicViewGroup extends ViewGroup {
                 calculateSize.setResultHeight(calculateSize.getResultHeight() + calculateSize.getCalculateHeight());
             }
         }
+        mChildViewInThisLineOrColumnForMeasure.add(getChildAt(index));
+        if (index == (getChildCount() - 1)) {
+            mChildViewInThisLineOrColumnForMeasure.clear();
+        }
         return calculateSize;
     }
 
@@ -255,6 +264,8 @@ public class DynamicViewGroup extends ViewGroup {
     private CalculateSize calculateForVertical(CalculateSize calculateSize, int index, boolean isForceNewColumn) {
         if (calculateSize.getCalculateHeight() + (calculateSize.getChildViewHeight() - mVerticalSpacing) > calculateSize.getMaxHeight()
             || isForceNewColumn) { // 超过了单列最大的高度,需要换列
+            // 换行的时候就清理上一行的数据
+            mChildViewInThisLineOrColumnForMeasure.clear();
             // 换列的时候更新left和top
             calculateSize.setResultHeight(Math.max(calculateSize.getResultHeight(), calculateSize.getCalculateHeight()));
             calculateSize.setResultWidth(calculateSize.getResultWidth() + calculateSize.getCalculateWidth());
@@ -278,6 +289,10 @@ public class DynamicViewGroup extends ViewGroup {
                 calculateSize.setResultHeight(Math.max(calculateSize.getResultHeight(), calculateSize.getCalculateHeight()));
                 calculateSize.setResultWidth(calculateSize.getResultWidth() + calculateSize.getCalculateWidth());
             }
+        }
+        mChildViewInThisLineOrColumnForMeasure.add(getChildAt(index));
+        if (index == (getChildCount() - 1)) {
+            mChildViewInThisLineOrColumnForMeasure.clear();
         }
         return calculateSize;
     }
@@ -385,11 +400,23 @@ public class DynamicViewGroup extends ViewGroup {
             ChildViewMarginSize marginSize = getChildViewMargin(childView);
             switch (mOrientation) {
                 case HORIZONTAL:
-                    layoutForHorizontal(childView, layoutSize, marginSize, i, isNewLineOrNewColumnByChildViewIndex(i));
+                    layoutForHorizontal(
+                        childView,
+                        layoutSize,
+                        marginSize,
+                        i,
+                        isNewLineOrNewColumnByChildViewIndex(mChildViewInThisLineOrColumn.size())
+                    );
                     break;
 
                 case VERTICAL:
-                    layoutForVertical(childView, layoutSize, marginSize, i, isNewLineOrNewColumnByChildViewIndex(i));
+                    layoutForVertical(
+                        childView,
+                        layoutSize,
+                        marginSize,
+                        i,
+                        isNewLineOrNewColumnByChildViewIndex(mChildViewInThisLineOrColumn.size())
+                    );
                     break;
             }
         }
@@ -527,10 +554,12 @@ public class DynamicViewGroup extends ViewGroup {
         }
         // 最长的那行会触及边界所以要减去padding，其他的行是不需要管padding的
         int viewGroupSpace = getMeasuredWidth() - getPaddingLeft() - getPaddingRight();
+
         // 如果viewGroupSpace大于totalWidth表明这行不是最长的，所以不需要处理padding
-        if (viewGroupSpace > totalWidth) {
-            viewGroupSpace = getMeasuredWidth();
-        }
+        //if (viewGroupSpace > totalWidth) {
+        //    viewGroupSpace = getMeasuredWidth();
+        //}
+
         int leftOffset = 0;
         switch (mGravity) {
             case GRAVITY_LEFT:
@@ -612,10 +641,12 @@ public class DynamicViewGroup extends ViewGroup {
         }
         // 最长的那行会触及边界所以要减去padding，其他的行是不需要管padding的
         int viewGroupSpace = getMeasuredHeight() - getPaddingTop() - getPaddingBottom();
+
         // 如果viewGroupSpace大于totalWidth表明这行不是最长的，所以不需要处理padding
-        if (viewGroupSpace > totalHeight) {
-            viewGroupSpace = getMeasuredHeight();
-        }
+        //if (viewGroupSpace > totalHeight) {
+        //    viewGroupSpace = getMeasuredHeight();
+        //}
+
         int topOffset = 0;
         switch (mGravity) {
             case GRAVITY_CENTER:

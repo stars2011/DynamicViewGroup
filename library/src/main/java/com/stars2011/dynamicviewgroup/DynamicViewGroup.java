@@ -150,9 +150,35 @@ public class DynamicViewGroup extends ViewGroup {
         if (widthMode == MeasureSpec.AT_MOST && heightMode == MeasureSpec.AT_MOST) { // 宽高都是wrap_content
             calculateSizeAndSetMeasuredDimensionDependOnMode(widthSize, false, heightSize, false);
         } else if (widthMode == MeasureSpec.AT_MOST) { // 无论高是EXACTLY还是UNSPECIFIED，都直接使用heightSize
-            calculateSizeAndSetMeasuredDimensionDependOnMode(widthSize, false, heightSize, true);
+            boolean heightBeMax = true;
+            if (heightMode == MeasureSpec.UNSPECIFIED && heightSize == 0) {
+                heightSize = Integer.MAX_VALUE;
+                heightBeMax = false;
+            }
+            calculateSizeAndSetMeasuredDimensionDependOnMode(widthSize, false, heightSize, heightBeMax);
         } else if (heightMode == MeasureSpec.AT_MOST) { // 无论宽是EXACTLY还是UNSPECIFIED，都直接使用widthSize
-            calculateSizeAndSetMeasuredDimensionDependOnMode(widthSize, true, heightSize, false);
+            boolean widthBeMax = true;
+            if (widthMode == MeasureSpec.UNSPECIFIED && widthSize == 0) {
+                widthSize = Integer.MAX_VALUE;
+                widthBeMax = false;
+            }
+            calculateSizeAndSetMeasuredDimensionDependOnMode(widthSize, widthBeMax, heightSize, false);
+        } else if (widthMode == MeasureSpec.UNSPECIFIED || heightMode == MeasureSpec.UNSPECIFIED) {
+            // 来到这里有以下三种情况
+            // 宽EXACTLY，高UNSPECIFIED
+            // 宽UNSPECIFIED，高EXACTLY
+            // 宽UNSPECIFIED，UNSPECIFIED
+            boolean widthBeMax = true;
+            boolean heightBeMax = true;
+            if (widthSize == 0) {
+                widthSize = Integer.MAX_VALUE;
+                widthBeMax = false;
+            }
+            if (heightSize == 0) {
+                heightSize = Integer.MAX_VALUE;
+                heightBeMax = false;
+            }
+            calculateSizeAndSetMeasuredDimensionDependOnMode(widthSize, widthBeMax, heightSize, heightBeMax);
         }
     }
 

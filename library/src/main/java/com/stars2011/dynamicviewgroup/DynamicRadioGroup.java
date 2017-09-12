@@ -80,7 +80,7 @@ public class DynamicRadioGroup extends DynamicViewGroup {
             if (onAutoCheck) {
                 return;
             }
-            if (buttonView.getId() == -1) {
+            if (buttonView.getId() == View.NO_ID) {
                 Log.e(TAG, "button id not set");
             }
             check(buttonView.getId());

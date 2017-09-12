@@ -18,4 +18,9 @@
         <attr name="horizontal_spacing" format="dimension" />
         <attr name="vertical_spacing" format="dimension" />
     </declare-styleable>
+
+    <declare-styleable name="DynamicRadioGroup">
+        <attr name="check_button" format="reference" />
+    </declare-styleable>
+
 </resources>

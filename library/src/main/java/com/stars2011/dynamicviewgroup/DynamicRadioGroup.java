@@ -1,6 +1,7 @@
 package com.stars2011.dynamicviewgroup;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
@@ -19,6 +20,7 @@ public class DynamicRadioGroup extends DynamicViewGroup {
     private CheckChangeTracker mCheckChangeTracker;
     private OnCheckChangeListener mOnCheckChangeListener;
     private boolean onAutoCheck = false;
+    private int mCheckId;
 
     public DynamicRadioGroup(Context context) {
         this(context, null);
@@ -30,17 +32,22 @@ public class DynamicRadioGroup extends DynamicViewGroup {
 
     public DynamicRadioGroup(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init();
+        init(context, attrs, defStyleAttr);
     }
 
-    private void init() {
+    private void init(Context context, AttributeSet attrs, int defStyleAttr) {
         mCheckChangeTracker = new CheckChangeTracker();
+        TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.DynamicRadioGroup, defStyleAttr, 0);
+        mCheckId = typedArray.getResourceId(R.styleable.DynamicRadioGroup_check_button, View.NO_ID);
     }
 
     @Override
     public void addView(View child, int index, ViewGroup.LayoutParams params) {
         if (child instanceof RadioButton) {
             RadioButton radioButton = (RadioButton) child;
+            if (mCheckId != View.NO_ID && radioButton.getId() == mCheckId) {
+                radioButton.setChecked(true);
+            }
             radioButton.setOnCheckedChangeListener(mCheckChangeTracker);
         }
         super.addView(child, index, params);

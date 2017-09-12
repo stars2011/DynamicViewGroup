@@ -95,6 +95,6 @@ public class DynamicRadioGroup extends DynamicViewGroup {
     }
 
     public interface OnCheckChangeListener {
-        void onCheckedChanged(DynamicViewGroup dynamicViewGroup, int checkId);
+        void onCheckedChanged(DynamicRadioGroup dynamicRadioGroup, int checkId);
     }
 }

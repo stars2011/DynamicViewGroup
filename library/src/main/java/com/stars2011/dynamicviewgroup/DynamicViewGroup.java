@@ -80,6 +80,7 @@ public class DynamicViewGroup extends ViewGroup {
 
     public void setOrientation(@OrientationMode int orientation) {
         this.mOrientation = orientation;
+        refresh();
     }
 
     public int getGravity() {
@@ -88,6 +89,7 @@ public class DynamicViewGroup extends ViewGroup {
 
     public void setGravity(@GravityMode int gravity) {
         this.mGravity = gravity;
+        refresh();
     }
 
     public int getMaxColumnNum() {
@@ -96,6 +98,7 @@ public class DynamicViewGroup extends ViewGroup {
 
     public void setMaxColumnNum(int maxColumnNum) {
         this.mMaxColumnNum = maxColumnNum;
+        refresh();
     }
 
     public int getMaxLineNum() {
@@ -104,6 +107,7 @@ public class DynamicViewGroup extends ViewGroup {
 
     public void setMaxLineNum(int maxLineNum) {
         this.mMaxLineNum = maxLineNum;
+        refresh();
     }
 
     public int getHorizontalSpacing() {
@@ -112,6 +116,7 @@ public class DynamicViewGroup extends ViewGroup {
 
     public void setHorizontalSpacing(int horizontalSpacing) {
         this.mHorizontalSpacing = horizontalSpacing;
+        refresh();
     }
 
     public int getVerticalSpacing() {
@@ -120,6 +125,11 @@ public class DynamicViewGroup extends ViewGroup {
 
     public void setVerticalSpacing(int verticalSpacing) {
         this.mVerticalSpacing = verticalSpacing;
+        refresh();
+    }
+
+    private void refresh() {
+        requestLayout();
     }
 
     @Override

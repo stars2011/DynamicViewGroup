@@ -1,36 +1,331 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/activity_sample"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context="com.stars2011.dynamicviewgroupdemo.SampleActivity">
 
-    <com.stars2011.dynamicviewgroup.DynamicViewGroup
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <com.stars2011.dynamicviewgroup.DynamicViewGroup
+            android:id="@+id/dynamic_view_group"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:visibility="visible"
+            app:gravity="gravity_left"
+            app:horizontal_spacing="3dp"
+            app:orientation="horizontal"
+            app:vertical_spacing="3dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/view_background"
+                android:padding="10dp"
+                android:text="有些短" />
+
+
+            <!--有些就是非常长Hello World!66-->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/view_background"
+                android:padding="10dp"
+                android:text="有些长" />
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/view_background"
+                android:padding="10dp"
+                android:text="有些就是超级长超级长超级还长" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/view_background"
+                android:padding="10dp"
+                android:text="有些长" />
+
+
+            <!--Hello 有的比较长World! 2-->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/view_background"
+                android:padding="10dp"
+                android:text="Hello World!" />
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/view_background"
+                android:padding="10dp"
+                android:text="又是短" />
+
+
+            <!--有些就是非常长Hello World! 4-->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/view_background"
+                android:padding="10dp"
+                android:text="来个短的"
+                android:visibility="visible" />
+
+
+            <!--sdfsdfHello World! 5-->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/view_background"
+                android:padding="10dp"
+                android:text="短" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/view_background"
+                android:padding="10dp"
+                android:text="Hello World! 1" />
+
+            <!--Hello 发World! 7-->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/view_background"
+                android:padding="10dp"
+                android:text="World! 2" />
+
+            <!--Hel地方lo World! 8-->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/view_background"
+                android:padding="10dp"
+                android:text="World! 3" />
+
+            <!--Hello World! 9-->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/view_background"
+                android:padding="10dp"
+                android:text="World! 4" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/view_background"
+                android:padding="10dp"
+                android:text="Hello World! 5" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/view_background"
+                android:padding="10dp"
+                android:text="Hello World! 6" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/view_background"
+                android:padding="10dp"
+                android:text="Hello World! 7" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/view_background"
+                android:padding="10dp"
+                android:text="Hello World! 8" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/view_background"
+                android:padding="10dp"
+                android:text="Hello Hello Hello Hello Hello World! 9" />
+
+        </com.stars2011.dynamicviewgroup.DynamicViewGroup>
+    </ScrollView>
+
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/red">
+        android:layout_marginLeft="10dp"
+        android:orientation="horizontal">
 
-        <TextView
+        <!--横向间距-->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:gravity="left"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="横向间距"
+                android:textColor="@color/black"
+                android:textSize="12sp" />
+
+            <EditText
+                android:id="@+id/et_horizontal_spacing"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="px"
+                android:inputType="number"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+
+        <!--竖向间距-->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="left"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="竖向间距"
+                android:textColor="@color/black"
+                android:textSize="12sp" />
+
+            <EditText
+                android:id="@+id/et_vertical_spacing"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="px"
+                android:inputType="number"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+
+        <!--行列限制-->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="left"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="最大行/列"
+                android:textColor="@color/black"
+                android:textSize="12sp" />
+
+            <EditText
+                android:id="@+id/et_max_column_or_line_num"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="px"
+                android:inputType="number"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!--排列方式-->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:text="方向" />
+
+    <com.stars2011.dynamicviewgroup.DynamicRadioGroup
+        android:id="@+id/drg_orientation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:visibility="visible"
+        app:check_button="@+id/rb_horizontal">
+
+        <RadioButton
+            android:id="@+id/rb_horizontal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Hello World!Hello World!Hello World!Hello World!" />
+            android:text="horizontal" />
 
-        <TextView
+        <RadioButton
+            android:id="@+id/rb_vertical"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Hello World!Hello World!Hello World!Hello World!" />
+            android:text="vertical" />
 
-        <TextView
+    </com.stars2011.dynamicviewgroup.DynamicRadioGroup>
+
+    <!--对齐方式-->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="5dp"
+        android:text="对齐" />
+
+    <com.stars2011.dynamicviewgroup.DynamicRadioGroup
+        android:id="@+id/drg_gravity"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:visibility="visible"
+        app:check_button="@+id/rb_gravity_left">
+
+        <RadioButton
+            android:id="@+id/rb_gravity_left"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Hello World!Hello World!Hello World!Hello World!" />
+            android:text="gravity_left" />
 
-        <TextView
+        <RadioButton
+            android:id="@+id/rb_gravity_right"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Hello World!Hello World!Hello World!Hello World!" />
+            android:text="gravity_right" />
 
-    </com.stars2011.dynamicviewgroup.DynamicViewGroup>
+        <RadioButton
+            android:id="@+id/rb_gravity_center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="gravity_center" />
 
-</RelativeLayout>
+        <RadioButton
+            android:id="@+id/rb_gravity_top"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="gravity_top" />
+
+        <RadioButton
+            android:id="@+id/rb_gravity_bottom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="gravity_bottom" />
+
+        <RadioButton
+            android:id="@+id/rb_gravity_both"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="gravity_both" />
+
+    </com.stars2011.dynamicviewgroup.DynamicRadioGroup>
+
+</LinearLayout>

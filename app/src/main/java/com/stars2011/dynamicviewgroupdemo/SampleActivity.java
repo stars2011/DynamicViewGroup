@@ -6,26 +6,34 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ScrollView;
 import com.stars2011.dynamicviewgroup.DynamicRadioGroup;
 import com.stars2011.dynamicviewgroup.DynamicViewGroup;
 
 public class SampleActivity extends AppCompatActivity {
 
     public static final String TAG = "SampleActivity";
+    private ScrollView mScrollView;
+    private DynamicViewGroup mDynamicViewGroup;
     private int mCurrentOrientation = DynamicViewGroup.HORIZONTAL;
     private int mCurrentGravity = DynamicViewGroup.GRAVITY_LEFT;
+    private boolean mHeightLimit = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sample);
-        final DynamicViewGroup dynamicViewGroup = (DynamicViewGroup) findViewById(R.id.dynamic_view_group);
-        //dynamicViewGroup.setGravity(DynamicViewGroup.GRAVITY_CENTER);
-        //dynamicViewGroup.setOrientation(DynamicViewGroup.HORIZONTAL);
-        //dynamicViewGroup.setMaxColumnNum(2);
-        //dynamicViewGroup.setHorizontalSpacing(6);
-        //dynamicViewGroup.setVerticalSpacing(6);
+        mScrollView = (ScrollView) findViewById(R.id.scrollView);
+        mDynamicViewGroup = (DynamicViewGroup) findViewById(R.id.dynamic_view_group);
+        //mDynamicViewGroup.setGravity(DynamicViewGroup.GRAVITY_CENTER);
+        //mDynamicViewGroup.setOrientation(DynamicViewGroup.HORIZONTAL);
+        //mDynamicViewGroup.setMaxColumnNum(2);
+        //mDynamicViewGroup.setHorizontalSpacing(6);
+        //mDynamicViewGroup.setVerticalSpacing(6);
 
         final DynamicRadioGroup dynamicRadioGroupOrientation = (DynamicRadioGroup) findViewById(R.id.drg_orientation);
         dynamicRadioGroupOrientation.setOnCheckChangeListener(new DynamicRadioGroup.OnCheckChangeListener() {
@@ -34,14 +42,16 @@ public class SampleActivity extends AppCompatActivity {
                 switch (checkId) {
                     case R.id.rb_horizontal:
                         Log.i(TAG, "Orientation rb_horizontal");
-                        dynamicViewGroup.setOrientation(DynamicViewGroup.HORIZONTAL);
+                        mDynamicViewGroup.setOrientation(DynamicViewGroup.HORIZONTAL);
                         mCurrentOrientation = DynamicViewGroup.HORIZONTAL;
+                        limitHeight(false);
                         break;
 
                     case R.id.rb_vertical:
                         Log.i(TAG, "Orientation rb_vertical");
-                        dynamicViewGroup.setOrientation(DynamicViewGroup.VERTICAL);
+                        mDynamicViewGroup.setOrientation(DynamicViewGroup.VERTICAL);
                         mCurrentOrientation = DynamicViewGroup.VERTICAL;
+                        limitHeight(mHeightLimit);
                         break;
                 }
             }
@@ -54,37 +64,37 @@ public class SampleActivity extends AppCompatActivity {
                 switch (checkId) {
                     case R.id.rb_gravity_left:
                         Log.i(TAG, "rb_gravity_left");
-                        dynamicViewGroup.setGravity(DynamicViewGroup.GRAVITY_LEFT);
+                        mDynamicViewGroup.setGravity(DynamicViewGroup.GRAVITY_LEFT);
                         mCurrentGravity = DynamicViewGroup.GRAVITY_LEFT;
                         break;
 
                     case R.id.rb_gravity_top:
                         Log.i(TAG, "rb_gravity_top");
-                        dynamicViewGroup.setGravity(DynamicViewGroup.GRAVITY_TOP);
+                        mDynamicViewGroup.setGravity(DynamicViewGroup.GRAVITY_TOP);
                         mCurrentGravity = DynamicViewGroup.GRAVITY_TOP;
                         break;
 
                     case R.id.rb_gravity_right:
                         Log.i(TAG, "rb_gravity_right");
-                        dynamicViewGroup.setGravity(DynamicViewGroup.GRAVITY_RIGHT);
+                        mDynamicViewGroup.setGravity(DynamicViewGroup.GRAVITY_RIGHT);
                         mCurrentGravity = DynamicViewGroup.GRAVITY_RIGHT;
                         break;
 
                     case R.id.rb_gravity_bottom:
                         Log.i(TAG, "rb_gravity_bottom");
-                        dynamicViewGroup.setGravity(DynamicViewGroup.GRAVITY_BOTTOM);
+                        mDynamicViewGroup.setGravity(DynamicViewGroup.GRAVITY_BOTTOM);
                         mCurrentGravity = DynamicViewGroup.GRAVITY_BOTTOM;
                         break;
 
                     case R.id.rb_gravity_center:
                         Log.i(TAG, "rb_gravity_center");
-                        dynamicViewGroup.setGravity(DynamicViewGroup.GRAVITY_CENTER);
+                        mDynamicViewGroup.setGravity(DynamicViewGroup.GRAVITY_CENTER);
                         mCurrentGravity = DynamicViewGroup.GRAVITY_CENTER;
                         break;
 
                     case R.id.rb_gravity_both:
                         Log.i(TAG, "rb_gravity_both");
-                        dynamicViewGroup.setGravity(DynamicViewGroup.GRAVITY_BOTH);
+                        mDynamicViewGroup.setGravity(DynamicViewGroup.GRAVITY_BOTH);
                         mCurrentGravity = DynamicViewGroup.GRAVITY_BOTH;
                         break;
                 }
@@ -108,7 +118,7 @@ public class SampleActivity extends AppCompatActivity {
                 if (TextUtils.isEmpty(s.toString())) {
                     return;
                 }
-                dynamicViewGroup.setHorizontalSpacing(Integer.valueOf(s.toString()));
+                mDynamicViewGroup.setHorizontalSpacing(Integer.valueOf(s.toString()));
             }
         });
 
@@ -129,7 +139,7 @@ public class SampleActivity extends AppCompatActivity {
                 if (TextUtils.isEmpty(s.toString())) {
                     return;
                 }
-                dynamicViewGroup.setVerticalSpacing(Integer.valueOf(s.toString()));
+                mDynamicViewGroup.setVerticalSpacing(Integer.valueOf(s.toString()));
             }
         });
 
@@ -152,14 +162,37 @@ public class SampleActivity extends AppCompatActivity {
                 }
                 switch (mCurrentOrientation) {
                     case DynamicViewGroup.HORIZONTAL:
-                        dynamicViewGroup.setMaxColumnNum(Integer.valueOf(s.toString()));
+                        mDynamicViewGroup.setMaxColumnNum(Integer.valueOf(s.toString()));
                         break;
 
                     case DynamicViewGroup.VERTICAL:
-                        dynamicViewGroup.setMaxLineNum(Integer.valueOf(s.toString()));
+                        mDynamicViewGroup.setMaxLineNum(Integer.valueOf(s.toString()));
                         break;
                 }
             }
         });
+
+        // 限高
+        ((CheckBox) findViewById(R.id.cb_limit)).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                mHeightLimit = isChecked;
+                if (mCurrentOrientation == DynamicViewGroup.VERTICAL) {
+                    limitHeight(mHeightLimit);
+                }
+            }
+        });
+    }
+
+    private void limitHeight(boolean limit) {
+        ViewGroup.LayoutParams params = mDynamicViewGroup.getLayoutParams();
+        if (limit) {
+            params.height = mScrollView.getHeight();
+        } else {
+            params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+        }
+        mDynamicViewGroup.setLayoutParams(params);
+        mDynamicViewGroup.requestLayout();
+        mScrollView.requestLayout();
     }
 }

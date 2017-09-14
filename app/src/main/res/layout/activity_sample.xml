@@ -8,20 +8,21 @@
     tools:context="com.stars2011.dynamicviewgroupdemo.SampleActivity">
 
     <ScrollView
+        android:id="@+id/scrollView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1">
 
         <com.stars2011.dynamicviewgroup.DynamicViewGroup
             android:id="@+id/dynamic_view_group"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="10dp"
             android:visibility="visible"
             app:gravity="gravity_left"
-            app:horizontal_spacing="3dp"
+            app:horizontal_spacing="10dp"
             app:orientation="horizontal"
-            app:vertical_spacing="3dp">
+            app:vertical_spacing="10dp">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -189,6 +190,7 @@
                 android:layout_height="wrap_content"
                 android:hint="px"
                 android:inputType="number"
+                android:text="20"
                 android:textSize="12sp" />
 
         </LinearLayout>
@@ -214,6 +216,7 @@
                 android:layout_height="wrap_content"
                 android:hint="px"
                 android:inputType="number"
+                android:text="20"
                 android:textSize="12sp" />
 
         </LinearLayout>
@@ -244,6 +247,14 @@
         </LinearLayout>
 
     </LinearLayout>
+
+    <!--限高-->
+    <CheckBox
+        android:id="@+id/cb_limit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="限高(vertical模式)"
+        android:textSize="12sp" />
 
     <!--排列方式-->
     <TextView

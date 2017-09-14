@@ -6,10 +6,13 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import com.stars2011.dynamicviewgroup.DynamicRadioGroup;
 import com.stars2011.dynamicviewgroup.DynamicViewGroup;
@@ -18,6 +21,9 @@ public class SampleActivity extends AppCompatActivity {
 
     public static final String TAG = "SampleActivity";
     private ScrollView mScrollView;
+    private LinearLayout mLimitLinearLayout;
+    private LinearLayout.LayoutParams mLimitLayoutParams;
+    private FrameLayout.LayoutParams mScrollViewLayoutParams;
     private DynamicViewGroup mDynamicViewGroup;
     private int mCurrentOrientation = DynamicViewGroup.HORIZONTAL;
     private int mCurrentGravity = DynamicViewGroup.GRAVITY_LEFT;
@@ -29,6 +35,10 @@ public class SampleActivity extends AppCompatActivity {
         setContentView(R.layout.activity_sample);
         mScrollView = (ScrollView) findViewById(R.id.scrollView);
         mDynamicViewGroup = (DynamicViewGroup) findViewById(R.id.dynamic_view_group);
+        mLimitLinearLayout = (LinearLayout) findViewById(R.id.ll_limit);
+        mLimitLayoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        mScrollViewLayoutParams = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT);
+
         //mDynamicViewGroup.setGravity(DynamicViewGroup.GRAVITY_CENTER);
         //mDynamicViewGroup.setOrientation(DynamicViewGroup.HORIZONTAL);
         //mDynamicViewGroup.setMaxColumnNum(2);
@@ -185,14 +195,18 @@ public class SampleActivity extends AppCompatActivity {
     }
 
     private void limitHeight(boolean limit) {
-        ViewGroup.LayoutParams params = mDynamicViewGroup.getLayoutParams();
         if (limit) {
-            params.height = mScrollView.getHeight();
+            mScrollView.removeView(mDynamicViewGroup);
+            mLimitLinearLayout.addView(mDynamicViewGroup, mLimitLayoutParams);
+            mScrollView.setVisibility(View.GONE);
+            mLimitLinearLayout.setVisibility(View.VISIBLE);
         } else {
-            params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+            mLimitLinearLayout.removeView(mDynamicViewGroup);
+            if (mScrollView.getChildCount() == 0) {
+                mScrollView.addView(mDynamicViewGroup, mScrollViewLayoutParams);
+            }
+            mScrollView.setVisibility(View.VISIBLE);
+            mLimitLinearLayout.setVisibility(View.GONE);
         }
-        mDynamicViewGroup.setLayoutParams(params);
-        mDynamicViewGroup.requestLayout();
-        mScrollView.requestLayout();
     }
 }

@@ -48,6 +48,8 @@ public class DynamicViewGroup extends ViewGroup {
     private int mMaxLineNum = NUM_NOT_SET; // 最大行数，当每列子View个数超过则自动换列（用于 VERTICAL 模式）
     private int mHorizontalSpacing = 0;
     private int mVerticalSpacing = 0;
+    // true表示当不够位置的时候则不layout该子View，false表示无论是否够位置都layout（可能会出现View部分不显示的问题）
+    private boolean mDoNotLayoutWhenHaveNoEnoughRoom = true;
     private List<View> mChildViewInThisLineOrColumn = new ArrayList<>();
     private List<View> mChildViewInThisLineOrColumnForMeasure = new ArrayList<>();
 
@@ -528,14 +530,24 @@ public class DynamicViewGroup extends ViewGroup {
             // 换列后继续layout
             right = layoutSize.getLeft() + childView.getMeasuredWidth() + leftMargin;
             bottom = layoutSize.getTop() + childView.getMeasuredHeight() + topMargin;
-            childView.layout(layoutSize.getLeft() + leftMargin, layoutSize.getTop() + topMargin, right, bottom);
+            // 检查是否有足够的位置layout，够位置才layout
+            if (right <= layoutSize.getViewGroupWidth() || !mDoNotLayoutWhenHaveNoEnoughRoom) {
+                childView.layout(layoutSize.getLeft() + leftMargin, layoutSize.getTop() + topMargin, right, bottom);
+            } else { // 不够位置则layout到一个不可见的位置
+                childView.layout(-childView.getMeasuredWidth(), -childView.getMeasuredHeight(), 0, 0);
+            }
             layoutSize.setTop(bottom + bottomMargin + mVerticalSpacing);
             layoutSize.setMaxWidthInThisColumn(Math.max(
                 layoutSize.getMaxWidthInThisColumn(),
                 childView.getMeasuredWidth() + leftMargin + rightMargin + mHorizontalSpacing
             ));
         } else { // 从上到下排列
-            childView.layout(layoutSize.getLeft() + leftMargin, layoutSize.getTop() + topMargin, right, bottom);
+            // 检查是否有足够的位置layout，够位置才layout
+            if (right <= layoutSize.getViewGroupWidth() || !mDoNotLayoutWhenHaveNoEnoughRoom) {
+                childView.layout(layoutSize.getLeft() + leftMargin, layoutSize.getTop() + topMargin, right, bottom);
+            } else { // 不够位置则layout到一个不可见的位置
+                childView.layout(-childView.getMeasuredWidth(), -childView.getMeasuredHeight(), 0, 0);
+            }
             layoutSize.setTop(bottom + bottomMargin + mVerticalSpacing);
             layoutSize.setMaxWidthInThisColumn(Math.max(
                 layoutSize.getMaxWidthInThisColumn(),

@@ -485,14 +485,24 @@ public class DynamicViewGroup extends ViewGroup {
             // 换行后继续layout
             right = layoutSize.getLeft() + childView.getMeasuredWidth() + leftMargin;
             bottom = layoutSize.getTop() + childView.getMeasuredHeight() + topMargin;
-            childView.layout(layoutSize.getLeft() + leftMargin, layoutSize.getTop() + topMargin, right, bottom);
+            // 检查是否有足够的位置layout，够位置才layout
+            if (bottom <= layoutSize.getViewGroupHeight() || !mDoNotLayoutWhenHaveNoEnoughRoom) {
+                childView.layout(layoutSize.getLeft() + leftMargin, layoutSize.getTop() + topMargin, right, bottom);
+            } else { // 不够位置则layout到一个不可见的位置
+                layoutViewToInVisiblePosition(childView);
+            }
             layoutSize.setLeft(right + rightMargin + mHorizontalSpacing);
             layoutSize.setMaxHeightInThisLine(Math.max(
                 layoutSize.getMaxHeightInThisLine(),
                 childView.getMeasuredHeight() + topMargin + bottomMargin + mVerticalSpacing
             ));
         } else { // 从左到右排列
-            childView.layout(layoutSize.getLeft() + leftMargin, layoutSize.getTop() + topMargin, right, bottom);
+            // 检查是否有足够的位置layout，够位置才layout
+            if (bottom <= layoutSize.getViewGroupHeight() || !mDoNotLayoutWhenHaveNoEnoughRoom) {
+                childView.layout(layoutSize.getLeft() + leftMargin, layoutSize.getTop() + topMargin, right, bottom);
+            } else { // 不够位置则layout到一个不可见的位置
+                layoutViewToInVisiblePosition(childView);
+            }
             layoutSize.setLeft(right + rightMargin + mHorizontalSpacing);
             layoutSize.setMaxHeightInThisLine(Math.max(
                 layoutSize.getMaxHeightInThisLine(),
@@ -534,7 +544,7 @@ public class DynamicViewGroup extends ViewGroup {
             if (right <= layoutSize.getViewGroupWidth() || !mDoNotLayoutWhenHaveNoEnoughRoom) {
                 childView.layout(layoutSize.getLeft() + leftMargin, layoutSize.getTop() + topMargin, right, bottom);
             } else { // 不够位置则layout到一个不可见的位置
-                childView.layout(-childView.getMeasuredWidth(), -childView.getMeasuredHeight(), 0, 0);
+                layoutViewToInVisiblePosition(childView);
             }
             layoutSize.setTop(bottom + bottomMargin + mVerticalSpacing);
             layoutSize.setMaxWidthInThisColumn(Math.max(
@@ -546,7 +556,7 @@ public class DynamicViewGroup extends ViewGroup {
             if (right <= layoutSize.getViewGroupWidth() || !mDoNotLayoutWhenHaveNoEnoughRoom) {
                 childView.layout(layoutSize.getLeft() + leftMargin, layoutSize.getTop() + topMargin, right, bottom);
             } else { // 不够位置则layout到一个不可见的位置
-                childView.layout(-childView.getMeasuredWidth(), -childView.getMeasuredHeight(), 0, 0);
+                layoutViewToInVisiblePosition(childView);
             }
             layoutSize.setTop(bottom + bottomMargin + mVerticalSpacing);
             layoutSize.setMaxWidthInThisColumn(Math.max(
@@ -558,6 +568,13 @@ public class DynamicViewGroup extends ViewGroup {
         if (childViewIndex == getChildCount() - 1) {
             adjustChildViewPositionDependOnGravityInVerticalMode(mChildViewInThisLineOrColumn);
         }
+    }
+
+    private void layoutViewToInVisiblePosition(View view) {
+        if (view == null) {
+            return;
+        }
+        view.layout(-view.getMeasuredWidth(), -view.getMeasuredHeight(), 0, 0);
     }
 
     private void adjustChildViewPositionDependOnGravityInHorizontalMode(List<View> childViewInThisLineOrColumn) {

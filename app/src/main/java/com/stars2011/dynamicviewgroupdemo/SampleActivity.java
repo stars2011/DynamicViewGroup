@@ -12,6 +12,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import com.stars2011.dynamicviewgroup.DynamicRadioGroup;
@@ -21,8 +22,8 @@ public class SampleActivity extends AppCompatActivity {
 
     public static final String TAG = "SampleActivity";
     private ScrollView mScrollView;
-    private LinearLayout mLimitLinearLayout;
-    private LinearLayout.LayoutParams mLimitLayoutParams;
+    private HorizontalScrollView mHorizontalScrollView;
+    private FrameLayout.LayoutParams mLimitLayoutParams;
     private FrameLayout.LayoutParams mScrollViewLayoutParams;
     private DynamicViewGroup mDynamicViewGroup;
     private int mCurrentOrientation = DynamicViewGroup.HORIZONTAL;
@@ -35,8 +36,9 @@ public class SampleActivity extends AppCompatActivity {
         setContentView(R.layout.activity_sample);
         mScrollView = (ScrollView) findViewById(R.id.scrollView);
         mDynamicViewGroup = (DynamicViewGroup) findViewById(R.id.dynamic_view_group);
-        mLimitLinearLayout = (LinearLayout) findViewById(R.id.ll_limit);
-        mLimitLayoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        mHorizontalScrollView = (HorizontalScrollView) findViewById(R.id.hsv_limit);
+
+        mLimitLayoutParams = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT);
         mScrollViewLayoutParams = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT);
 
         //mDynamicViewGroup.setGravity(DynamicViewGroup.GRAVITY_CENTER);
@@ -197,16 +199,18 @@ public class SampleActivity extends AppCompatActivity {
     private void limitHeight(boolean limit) {
         if (limit) {
             mScrollView.removeView(mDynamicViewGroup);
-            mLimitLinearLayout.addView(mDynamicViewGroup, mLimitLayoutParams);
+            if (mHorizontalScrollView.getChildCount() == 0) {
+                mHorizontalScrollView.addView(mDynamicViewGroup, mLimitLayoutParams);
+            }
             mScrollView.setVisibility(View.GONE);
-            mLimitLinearLayout.setVisibility(View.VISIBLE);
+            mHorizontalScrollView.setVisibility(View.VISIBLE);
         } else {
-            mLimitLinearLayout.removeView(mDynamicViewGroup);
+            mHorizontalScrollView.removeView(mDynamicViewGroup);
             if (mScrollView.getChildCount() == 0) {
                 mScrollView.addView(mDynamicViewGroup, mScrollViewLayoutParams);
             }
             mScrollView.setVisibility(View.VISIBLE);
-            mLimitLinearLayout.setVisibility(View.GONE);
+            mHorizontalScrollView.setVisibility(View.GONE);
         }
     }
 }

@@ -1,11 +1,22 @@
-### 动态适应布局，流式布局，支持以下功能：
+##### 动态适应布局，流式布局，支持以下功能：
 1、自动换行。  
 2、设置横向/竖向排列子View。  
 3、设置子View的双端对齐，居中对齐，左对齐，右对齐，顶对齐，底对齐。  
 4、设置每行/列最大个数。  
 5、设置横向、竖向间距。  
 
------
+
+----------
+
+##### 使用方式:   
+在module的build.gradle中添加：  
+
+    dependencies {
+		compile 'com.github.stars2011:DynamicViewGroup:v1.0.0'
+    }
+
+----------
+
 
 ### DynamicViewGroup
 #### 1、自动换行
@@ -173,3 +184,54 @@
 ![设置横向和竖向间距](http://a3.qpic.cn/psb?/V13PyPWD4OxnNU/4.hQTNNxqn7.rSn*2RHOyUX5.QOnmVGHPJzmZHXa8Y8!/b/dPIAAAAAAAAA&bo=vwEbA78BGwMC7so!&rf=viewer_4)
 
 ----------
+
+#### 使用示例：  
+##### 1、xml配置示例：  
+```
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.stars2011.dynamicviewgroupdemo.SampleActivity">
+
+    <com.stars2011.dynamicviewgroup.DynamicViewGroup
+        android:id="@+id/dynamic_view_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:orientation="horizontal"         排列方式
+        app:gravity="gravity_left"           对齐方式
+        app:max_column_num="3"               每行最多有多少列
+        app:horizontal_spacing="10dp"        横向间距
+        app:vertical_spacing="10dp">         竖向间距
+        
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/view_background"
+            android:padding="10dp"
+            android:text="内容" />
+            
+    </com.stars2011.dynamicviewgroup.DynamicViewGroup>
+    
+</LinearLayout>
+```
+**可配置的参数：**  
+
+>* orientation （可选值：horizontal 、vertical）
+>* gravity（可选值：gravity_left、gravity_right、gravity_center、gravity_top、gravity_bottom、gravity_both）
+>* horizontal_spacing
+>* vertical_spacing
+>* max_line_num
+>* max_column_num
+
+##### 2、代码配置示例：  
+
+        mDynamicViewGroup.setOrientation(DynamicViewGroup.HORIZONTAL); // 排列方式
+        mDynamicViewGroup.setGravity(DynamicViewGroup.GRAVITY_LEFT); // 对齐方式
+        mDynamicViewGroup.setMaxColumnNum(3); // 每行最多有多少列
+        mDynamicViewGroup.setHorizontalSpacing(20); // 横向间距
+        mDynamicViewGroup.setVerticalSpacing(20);  // 竖向间距
+

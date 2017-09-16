@@ -1,4 +1,4 @@
-动态适应布局，流式布局，支持以下功能：
+### 动态适应布局，流式布局，支持以下功能：
 1、自动换行。
 2、设置横向/竖向排列子View。
 3、设置子View的双端对齐，居中对齐，左对齐，右对齐，顶对齐，底对齐。
@@ -12,10 +12,10 @@
 横/竖向排列子View的时候，当前行/列满了的话自动创建新的行/列排列子View。
 
 横向排列自动换行：
-(http://a3.qpic.cn/psb?/V13PyPWD4OxnNU/a4qZckQXjmGre5CXlBLHJlQnKZ9NaoapAAL*CcBlrdw!/b/dPIAAAAAAAAA&bo=vwEkAQAAAAARAKw!&rf=viewer_4)
+![横向排列自动换行](http://a3.qpic.cn/psb?/V13PyPWD4OxnNU/a4qZckQXjmGre5CXlBLHJlQnKZ9NaoapAAL*CcBlrdw!/b/dPIAAAAAAAAA&bo=vwEkAQAAAAARAKw!&rf=viewer_4)
 
 竖向排列自动换列：
-(http://a1.qpic.cn/psb?/V13PyPWD4OxnNU/w69WtPLRMGgSqrCqgecAqr49lmlTB0tiyj0DZqeYMtM!/b/dD4BAAAAAAAA&bo=vwHZAQAAAAARAFE!&rf=viewer_4)
+![竖向排列自动换列](http://a1.qpic.cn/psb?/V13PyPWD4OxnNU/w69WtPLRMGgSqrCqgecAqr49lmlTB0tiyj0DZqeYMtM!/b/dD4BAAAAAAAA&bo=vwHZAQAAAAARAFE!&rf=viewer_4)
 
 #### 2、设置横向/竖向排列子View
 可以通过代码设置子View的排列方向：
@@ -35,19 +35,16 @@
 ----------
 
 ***排列方式（horizontal/vertical）切换gif效果如下：***
-
-![enter image description here](http://a3.qpic.cn/psb?/V13PyPWD4OxnNU/cPOa7rcK5B7AOTQVmSIB52w0XdralQyodsenGsHXxP8!/b/dPIAAAAAAAAA&bo=vwEbA78BGwMCb0s!&rf=viewer_4)
+![排列方式（horizontal/vertical）切换](http://a3.qpic.cn/psb?/V13PyPWD4OxnNU/cPOa7rcK5B7AOTQVmSIB52w0XdralQyodsenGsHXxP8!/b/dPIAAAAAAAAA&bo=vwEbA78BGwMCb0s!&rf=viewer_4)
 
 ----------
 
 
 横向排列：
-
-![enter image description here](http://a3.qpic.cn/psb?/V13PyPWD4OxnNU/a4qZckQXjmGre5CXlBLHJlQnKZ9NaoapAAL*CcBlrdw!/b/dPIAAAAAAAAA&bo=vwEkAQAAAAARAKw!&rf=viewer_4)
+![横向排列](http://a3.qpic.cn/psb?/V13PyPWD4OxnNU/a4qZckQXjmGre5CXlBLHJlQnKZ9NaoapAAL*CcBlrdw!/b/dPIAAAAAAAAA&bo=vwEkAQAAAAARAKw!&rf=viewer_4)
 
 竖向排列：
-
-![enter image description here](http://a1.qpic.cn/psb?/V13PyPWD4OxnNU/w69WtPLRMGgSqrCqgecAqr49lmlTB0tiyj0DZqeYMtM!/b/dD4BAAAAAAAA&bo=vwHZAQAAAAARAFE!&rf=viewer_4)
+![竖向排列](http://a1.qpic.cn/psb?/V13PyPWD4OxnNU/w69WtPLRMGgSqrCqgecAqr49lmlTB0tiyj0DZqeYMtM!/b/dD4BAAAAAAAA&bo=vwHZAQAAAAARAFE!&rf=viewer_4)
 
 #### 3、设置子View的对齐方式
 支持的对齐方式：
@@ -79,10 +76,10 @@
 ----------
 
 ***横向模式对齐方式（gravity）切换gif效果：***
-![enter image description here](http://a3.qpic.cn/psb?/V13PyPWD4OxnNU/zx3dPAiEn2eI6Zgh*.KqDvNjG1k0agYUIKawUXY8Ap0!/b/dPIAAAAAAAAA&bo=vwEbA78BGwMCfVk!&rf=viewer_4)
+![横向模式对齐方式（gravity）切换](http://a3.qpic.cn/psb?/V13PyPWD4OxnNU/zx3dPAiEn2eI6Zgh*.KqDvNjG1k0agYUIKawUXY8Ap0!/b/dPIAAAAAAAAA&bo=vwEbA78BGwMCfVk!&rf=viewer_4)
 
 ***竖向模式对齐方式（gravity）切换gif效果：***
-![enter image description here](http://a3.qpic.cn/psb?/V13PyPWD4OxnNU/.OiUhPvtL6yZT4wjmGhK4j7bwy*if..1BRMYHCyMscA!/b/dPIAAAAAAAAA&bo=vwEbA78BGwMCoYU!&rf=viewer_4)
+![竖向模式对齐方式（gravity）切换](http://a3.qpic.cn/psb?/V13PyPWD4OxnNU/.OiUhPvtL6yZT4wjmGhK4j7bwy*if..1BRMYHCyMscA!/b/dPIAAAAAAAAA&bo=vwEbA78BGwMCoYU!&rf=viewer_4)
 
 ----------
 
@@ -135,12 +132,10 @@
 ----------
 
 ***设置每行最大的子View个数gif效果（到达最大行个数换行）：***
-
-![enter image description here](http://a3.qpic.cn/psb?/V13PyPWD4OxnNU/Da*8VFG8oqFK3hSg*KEVC5Pr31SLrLPjMBgQu65gKCo!/b/dPIAAAAAAAAA&bo=vwEbA78BGwMCxuI!&rf=viewer_4)
+![设置每行最大的子View个数](http://a3.qpic.cn/psb?/V13PyPWD4OxnNU/Da*8VFG8oqFK3hSg*KEVC5Pr31SLrLPjMBgQu65gKCo!/b/dPIAAAAAAAAA&bo=vwEbA78BGwMCxuI!&rf=viewer_4)
 
 ***设置每列最大的子View个数gif效果（到达最大列个数换列）：***
-
-![enter image description here](http://a3.qpic.cn/psb?/V13PyPWD4OxnNU/bi.SYtkIEe*OJJ.lIUOM*No7cc6Sd3ZCE.VuUF.v9Oo!/b/dPIAAAAAAAAA&bo=vwEbA78BGwMC8dU!&rf=viewer_4)
+![设置每列最大的子View个数](http://a3.qpic.cn/psb?/V13PyPWD4OxnNU/bi.SYtkIEe*OJJ.lIUOM*No7cc6Sd3ZCE.VuUF.v9Oo!/b/dPIAAAAAAAAA&bo=vwEbA78BGwMC8dU!&rf=viewer_4)
 
 ----------
 
@@ -165,6 +160,6 @@
 ----------
 
 ***设置横向和竖向间距gif效果：***
-![enter image description here](http://a3.qpic.cn/psb?/V13PyPWD4OxnNU/4.hQTNNxqn7.rSn*2RHOyUX5.QOnmVGHPJzmZHXa8Y8!/b/dPIAAAAAAAAA&bo=vwEbA78BGwMC7so!&rf=viewer_4)
+![设置横向和竖向间距](http://a3.qpic.cn/psb?/V13PyPWD4OxnNU/4.hQTNNxqn7.rSn*2RHOyUX5.QOnmVGHPJzmZHXa8Y8!/b/dPIAAAAAAAAA&bo=vwEbA78BGwMC7so!&rf=viewer_4)
 
 ----------

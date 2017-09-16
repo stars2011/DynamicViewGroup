@@ -44,9 +44,11 @@
 
 
 横向排列：   
+
 ![横向排列](http://a3.qpic.cn/psb?/V13PyPWD4OxnNU/a4qZckQXjmGre5CXlBLHJlQnKZ9NaoapAAL*CcBlrdw!/b/dPIAAAAAAAAA&bo=vwEkAQAAAAARAKw!&rf=viewer_4)
 
 竖向排列：   
+
 ![竖向排列](http://a1.qpic.cn/psb?/V13PyPWD4OxnNU/w69WtPLRMGgSqrCqgecAqr49lmlTB0tiyj0DZqeYMtM!/b/dD4BAAAAAAAA&bo=vwHZAQAAAAARAFE!&rf=viewer_4)
 
 #### 3、设置子View的对齐方式
@@ -79,9 +81,11 @@
 ----------
 
 ***横向模式对齐方式（gravity）切换gif效果：***  
+
 ![横向模式对齐方式（gravity）切换](http://a3.qpic.cn/psb?/V13PyPWD4OxnNU/zx3dPAiEn2eI6Zgh*.KqDvNjG1k0agYUIKawUXY8Ap0!/b/dPIAAAAAAAAA&bo=vwEbA78BGwMCfVk!&rf=viewer_4)
 
 ***竖向模式对齐方式（gravity）切换gif效果：***  
+
 ![竖向模式对齐方式（gravity）切换](http://a3.qpic.cn/psb?/V13PyPWD4OxnNU/.OiUhPvtL6yZT4wjmGhK4j7bwy*if..1BRMYHCyMscA!/b/dPIAAAAAAAAA&bo=vwEbA78BGwMCoYU!&rf=viewer_4)
 
 ----------
@@ -135,9 +139,11 @@
 ----------
 
 ***设置每行最大的子View个数gif效果（到达最大行个数换行）：***  
+
 ![设置每行最大的子View个数](http://a3.qpic.cn/psb?/V13PyPWD4OxnNU/Da*8VFG8oqFK3hSg*KEVC5Pr31SLrLPjMBgQu65gKCo!/b/dPIAAAAAAAAA&bo=vwEbA78BGwMCxuI!&rf=viewer_4)
 
 ***设置每列最大的子View个数gif效果（到达最大列个数换列）：***  
+
 ![设置每列最大的子View个数](http://a3.qpic.cn/psb?/V13PyPWD4OxnNU/bi.SYtkIEe*OJJ.lIUOM*No7cc6Sd3ZCE.VuUF.v9Oo!/b/dPIAAAAAAAAA&bo=vwEbA78BGwMC8dU!&rf=viewer_4)
 
 ----------
@@ -163,6 +169,7 @@
 ----------
 
 ***设置横向和竖向间距gif效果：***  
+
 ![设置横向和竖向间距](http://a3.qpic.cn/psb?/V13PyPWD4OxnNU/4.hQTNNxqn7.rSn*2RHOyUX5.QOnmVGHPJzmZHXa8Y8!/b/dPIAAAAAAAAA&bo=vwEbA78BGwMC7so!&rf=viewer_4)
 
 ----------

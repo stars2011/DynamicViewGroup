@@ -37,6 +37,7 @@
 ----------
 
 ***排列方式（horizontal/vertical）切换gif效果如下：***   
+
 ![排列方式（horizontal/vertical）切换](http://a3.qpic.cn/psb?/V13PyPWD4OxnNU/cPOa7rcK5B7AOTQVmSIB52w0XdralQyodsenGsHXxP8!/b/dPIAAAAAAAAA&bo=vwEbA78BGwMCb0s!&rf=viewer_4)
 
 ----------

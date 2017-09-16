@@ -180,16 +180,19 @@ public class SampleActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
+                int max = 0;
                 if (TextUtils.isEmpty(s.toString())) {
-                    return;
+                    max = DynamicViewGroup.NUM_NOT_SET;
+                } else {
+                    max = Integer.valueOf(s.toString());
                 }
                 switch (mCurrentOrientation) {
                     case DynamicViewGroup.HORIZONTAL:
-                        mDynamicViewGroup.setMaxColumnNum(Integer.valueOf(s.toString()));
+                        mDynamicViewGroup.setMaxColumnNum(max);
                         break;
 
                     case DynamicViewGroup.VERTICAL:
-                        mDynamicViewGroup.setMaxLineNum(Integer.valueOf(s.toString()));
+                        mDynamicViewGroup.setMaxLineNum(max);
                         break;
                 }
             }

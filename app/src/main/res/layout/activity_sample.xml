@@ -46,7 +46,7 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/view_background"
                 android:padding="10dp"
-                android:text="有些就是超级长超级长超级还长" />
+                android:text="又有些" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -127,7 +127,7 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/view_background"
                 android:padding="10dp"
-                android:text="Hello World! 5" />
+                android:text="Hello! 5" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -155,7 +155,7 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/view_background"
                 android:padding="10dp"
-                android:text="Hello Hello Hello Hello Hello World! 9" />
+                android:text="Hi Hello World! 9" />
 
         </com.stars2011.dynamicviewgroup.DynamicViewGroup>
     </ScrollView>
@@ -248,7 +248,6 @@
                 android:id="@+id/et_max_column_or_line_num"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="px"
                 android:inputType="number"
                 android:textSize="12sp" />
 

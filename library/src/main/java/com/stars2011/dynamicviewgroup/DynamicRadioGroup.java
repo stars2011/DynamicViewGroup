@@ -70,14 +70,48 @@ public class DynamicRadioGroup extends DynamicViewGroup {
             }
         }
         View view = findViewById(viewId);
-        if (view != null && view instanceof RadioButton) {
+        boolean isNotNullAndRadioButton = (view != null && view instanceof RadioButton);
+        if (isNotNullAndRadioButton) {
             RadioButton radioButton = (RadioButton) view;
             radioButton.setChecked(true);
+            mCheckId = viewId;
         }
         onAutoCheck = false;
-        if (mOnCheckChangeListener != null) {
+        if (mOnCheckChangeListener != null && isNotNullAndRadioButton) {
             mOnCheckChangeListener.onCheckedChanged(DynamicRadioGroup.this, viewId);
         }
+    }
+
+    public void setRadioButtonEnable(int[] buttonId, boolean[] enable) {
+        if (buttonId == null || enable == null) {
+            return;
+        }
+        if (buttonId.length != enable.length) {
+            return;
+        }
+        for (int i = 0; i < buttonId.length; i++) {
+            View view = findViewById(buttonId[i]);
+            if (view == null || !(view instanceof RadioButton)) {
+                continue;
+            }
+            RadioButton radioButton = ((RadioButton) view);
+            radioButton.setEnabled(enable[i]);
+        }
+    }
+
+    public void setAllRadioButtonEnable(boolean enable) {
+        for (int i = 0; i < getChildCount(); i++) {
+            View view = getChildAt(i);
+            if (!(view instanceof RadioButton)) {
+                continue;
+            }
+            RadioButton radioButton = ((RadioButton) view);
+            radioButton.setEnabled(enable);
+        }
+    }
+
+    public int getCheckId() {
+        return mCheckId;
     }
 
     private class CheckChangeTracker implements CompoundButton.OnCheckedChangeListener {

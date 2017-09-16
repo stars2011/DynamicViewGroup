@@ -12,12 +12,10 @@
 横/竖向排列子View的时候，当前行/列满了的话自动创建新的行/列排列子View。
 
 横向排列自动换行：
-
-![enter image description here](http://a3.qpic.cn/psb?/V13PyPWD4OxnNU/a4qZckQXjmGre5CXlBLHJlQnKZ9NaoapAAL*CcBlrdw!/b/dPIAAAAAAAAA&bo=vwEkAQAAAAARAKw!&rf=viewer_4)
+(http://a3.qpic.cn/psb?/V13PyPWD4OxnNU/a4qZckQXjmGre5CXlBLHJlQnKZ9NaoapAAL*CcBlrdw!/b/dPIAAAAAAAAA&bo=vwEkAQAAAAARAKw!&rf=viewer_4)
 
 竖向排列自动换列：
-
-![enter image description here](http://a1.qpic.cn/psb?/V13PyPWD4OxnNU/w69WtPLRMGgSqrCqgecAqr49lmlTB0tiyj0DZqeYMtM!/b/dD4BAAAAAAAA&bo=vwHZAQAAAAARAFE!&rf=viewer_4)
+(http://a1.qpic.cn/psb?/V13PyPWD4OxnNU/w69WtPLRMGgSqrCqgecAqr49lmlTB0tiyj0DZqeYMtM!/b/dD4BAAAAAAAA&bo=vwHZAQAAAAARAFE!&rf=viewer_4)
 
 #### 2、设置横向/竖向排列子View
 可以通过代码设置子View的排列方向：

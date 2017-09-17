@@ -9,11 +9,20 @@
 ----------
 
 ##### 使用方式:   
+在项目的build.gradle中添加：  
+
+    allprojects {
+		repositories {
+			...
+			maven { url 'https://jitpack.io' }
+		}
+	}
+
 在module的build.gradle中添加：  
 
     dependencies {
-		compile 'com.github.stars2011:DynamicViewGroup:v1.0.0'
-    }
+		compile 'com.github.stars2011:DynamicViewGroup:v1.0.1'
+	}
 
 ----------
 
